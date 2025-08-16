@@ -66,7 +66,6 @@ server.js
 package.json
 
 scss
-Copier le code
 
 Example (Django/DRF):
 
@@ -154,14 +153,7 @@ This project is licensed under the MIT License.
 Your Name
 Manga Set Web – Capstone Project Backend
 
-yaml
-Copier le code
 
----
-
-If you want, I can also create a **full combined project README** that covers **both frontend and backend** with setup instructions and API examples, so it’s ready for GitHub submission.  
-
-Do you want me to do that?
 
 
 
