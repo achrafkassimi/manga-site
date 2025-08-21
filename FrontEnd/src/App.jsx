@@ -1,13 +1,13 @@
 import './App.css'
-import NavigationBar from "../src/home/components/NavigationBar";
-import FeaturedManga from "../src/home/components/FeaturedManga";
-import PopularToday from "../src/home/components/PopularToday";
-import LatestUpdates from "../src/home/components/LatestUpdates";
-import Recommendations from "../src/home/components/Recommendations";
-import AdvancedSearch from "../src/home/components/AdvancedSearch";
-import NewSeries from "../src/home/components/NewSeries";
-import GenreCloud from "../src/home/components/GenreCloud";
-import Footer from "../src/home/components/Footer";
+import NavigationBar from "./home/components/NavigationBar";
+import FeaturedManga from "./home/components/FeaturedManga";
+import PopularToday from "./home/components/PopularToday";
+import LatestUpdates from "./home/components/LatestUpdates";
+import Recommendations from "./home/components/Recommendations";
+import AdvancedSearch from "./home/components/AdvancedSearch";
+import NewSeries from "./home/components/NewSeries";
+import GenreCloud from "./home/components/GenreCloud";
+import Footer from "./home/components/Footer";
 
 function App() {
   const featured = [
