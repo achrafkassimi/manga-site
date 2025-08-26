@@ -46,12 +46,19 @@ function App() {
       <NavigationBar />
       <div className="container-fluid px-3 px-lg-5">
         <FeaturedManga items={featured} />
+        <hr />
         <PopularToday />
+        <hr />
         <LatestUpdates />
+        <hr />
         <Recommendations />
+        <hr />
         <AdvancedSearch />
+        <hr />
         <NewSeries />
+        <hr />
         <GenreCloud />
+        <hr />
       </div>
       <Footer />
     </div>
