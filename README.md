@@ -17,9 +17,9 @@ The app is styled with **Tailwind CSS** and deployed on **Vercel/Netlify**.
 
 ## 🛠️ Tech Stack
 
-- **Frontend:** React + Tailwind CSS  
+- **Frontend:** React + Bootstrap  
 - **Routing:** React Router  
-- **API:** MangaDex API  
+- **API:** MangaSet API personnel My project BackEnd
 - **Deployment:** Netlify / Vercel  
 
 ---
@@ -43,9 +43,9 @@ This is the **backend API** for the Manga Set Web project. It serves manga data 
 
 ## 🛠️ Tech Stack
 
-- **Backend:** Node.js + Express OR Django + DRF  
-- **API:** MangaDex API  
-- **Database:** Optional (for caching/favorites)  
+- **Backend:** Django + DRF  
+- **API:** I create my API application   
+- **Database:** Database Postgres  
 - **Deployment:** Heroku / Render / Railway  
 
 ---
