@@ -70,6 +70,9 @@
 //   );
 // };
 
+
+
+
 // src/context/AuthContext.jsx - Version basique pour test
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
@@ -134,3 +137,4 @@ export const AuthProvider = ({ children }) => {
     </AuthContext.Provider>
   );
 };
+

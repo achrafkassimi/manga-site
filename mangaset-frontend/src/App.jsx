@@ -1,141 +1,4 @@
-// // import { useState } from 'react'
-// // import reactLogo from './assets/react.svg'
-// // import viteLogo from '/vite.svg'
-// // import './App.css'
-
-// // function App() {
-// //   const [count, setCount] = useState(0)
-
-// //   return (
-// //     <>
-// //       <div>
-// //         <a href="https://vite.dev" target="_blank">
-// //           <img src={viteLogo} className="logo" alt="Vite logo" />
-// //         </a>
-// //         <a href="https://react.dev" target="_blank">
-// //           <img src={reactLogo} className="logo react" alt="React logo" />
-// //         </a>
-// //       </div>
-// //       <h1>Vite + React</h1>
-// //       <div className="card">
-// //         <button onClick={() => setCount((count) => count + 1)}>
-// //           count is {count}
-// //         </button>
-// //         <p>
-// //           Edit <code>src/App.jsx</code> and save to test HMR
-// //         </p>
-// //       </div>
-// //       <p className="read-the-docs">
-// //         Click on the Vite and React logos to learn more
-// //       </p>
-// //     </>
-// //   )
-// // }
-
-// // export default App
-
-// // src/App.jsx
-// import React from 'react'
-// import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-// import { ToastContainer } from 'react-toastify'
-// import 'react-toastify/dist/ReactToastify.css'
-
-// // Context Providers
-// import { AuthProvider } from './context/AuthContext'
-
-// // Components
-// import NavigationBar from './components/common/NavigationBar'
-// import Footer from './components/common/Footer'
-
-// // Pages
-// import HomePage from './pages/HomePage'
-// import MangaDetailsPage from './pages/MangaDetailsPage'
-// import ReaderPage from './pages/ReaderPage'
-// import SearchPage from './pages/SearchPage'
-// import UserProfilePage from './pages/UserProfilePage'
-// import LoginForm from './components/user/LoginForm'
-// import RegisterForm from './components/user/RegisterForm'
-
-// // Utility Components
-// import ProtectedRoute from './components/common/ProtectedRoute'
-// import ScrollToTop from './components/common/ScrollToTop'
-
-// function App() {
-//   return (
-//     <Router>
-//       <AuthProvider>
-//         <div className="App">
-//           <ScrollToTop />
-//           <NavigationBar />
-          
-//           <main style={{ minHeight: 'calc(100vh - 200px)' }}>
-//             <Routes>
-//               {/* Public Routes */}
-//               <Route path="/" element={<HomePage />} />
-//               <Route path="/manga/:slug" element={<MangaDetailsPage />} />
-//               <Route path="/read/:slug/:chapterId" element={<ReaderPage />} />
-//               <Route path="/search" element={<SearchPage />} />
-//               <Route path="/browse" element={<SearchPage />} />
-//               <Route path="/popular" element={<SearchPage />} />
-//               <Route path="/latest" element={<SearchPage />} />
-//               <Route path="/new" element={<SearchPage />} />
-//               <Route path="/genre/:genre" element={<SearchPage />} />
-              
-//               {/* Auth Routes */}
-//               <Route path="/login" element={<LoginForm />} />
-//               <Route path="/register" element={<RegisterForm />} />
-              
-//               {/* Protected Routes */}
-//               <Route path="/profile" element={
-//                 <ProtectedRoute>
-//                   <UserProfilePage />
-//                 </ProtectedRoute>
-//               } />
-//               <Route path="/favorites" element={
-//                 <ProtectedRoute>
-//                   <UserProfilePage />
-//                 </ProtectedRoute>
-//               } />
-//               <Route path="/history" element={
-//                 <ProtectedRoute>
-//                   <UserProfilePage />
-//                 </ProtectedRoute>
-//               } />
-              
-//               {/* 404 Route */}
-//               <Route path="*" element={
-//                 <div className="container mt-5 text-center">
-//                   <h1>404 - Page Not Found</h1>
-//                   <p>The page you're looking for doesn't exist.</p>
-//                   <a href="/" className="btn btn-primary">Go Home</a>
-//                 </div>
-//               } />
-//             </Routes>
-//           </main>
-          
-//           <Footer />
-          
-//           {/* Toast Notifications */}
-//           <ToastContainer
-//             position="top-right"
-//             autoClose={3000}
-//             hideProgressBar={false}
-//             newestOnTop={false}
-//             closeOnClick
-//             rtl={false}
-//             pauseOnFocusLoss
-//             draggable
-//             pauseOnHover
-//           />
-//         </div>
-//       </AuthProvider>
-//     </Router>
-//   )
-// }
-
-// export default App
-
-// src/App.jsx - Version de test pour Task 3.6
+// src/App.jsx - Version mise à jour avec AuthPage
 import React from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
@@ -148,6 +11,7 @@ import { AuthProvider } from './context/AuthContext'
 import NavigationBar from './components/common/NavigationBar'
 import Footer from './components/common/Footer'
 import HomePage from './pages/HomePage'
+import AuthPage from './pages/AuthPage'
 
 // Pages temporaires pour test
 import TestPage from './pages/TestPage'
@@ -156,88 +20,153 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <div className="App">
+        <div className="App d-flex flex-column min-vh-100">
           <NavigationBar />
           
-          <main style={{ minHeight: 'calc(100vh - 200px)' }}>
+          <main className="flex-grow-1">
             <Routes>
               {/* Route principale - HomePage avec tous les composants */}
               <Route path="/" element={<HomePage />} />
+              
+              {/* Route d'authentification combinée */}
+              <Route path="/auth" element={<AuthPage />} />
+              <Route path="/login" element={<AuthPage />} />
+              <Route path="/register" element={<AuthPage />} />
               
               {/* Route de test pour composants individuels */}
               <Route path="/test" element={<TestPage />} />
               
               {/* Routes temporaires pour navigation */}
               <Route path="/manga/:slug" element={
-                <div className="container mt-5 text-center">
+                <div className="container mt-5 text-center py-5">
+                  <i className="fas fa-book fa-3x text-primary mb-3"></i>
                   <h2>Manga Details Page</h2>
-                  <p>Cette page sera développée dans la suite du projet.</p>
-                  <a href="/" className="btn btn-primary">Retour à l'accueil</a>
+                  <p className="text-muted">Cette page sera développée dans la suite du projet.</p>
+                  <a href="/" className="btn btn-primary">
+                    <i className="fas fa-home me-2"></i>
+                    Retour à l'accueil
+                  </a>
                 </div>
               } />
               
               <Route path="/search" element={
-                <div className="container mt-5 text-center">
+                <div className="container mt-5 text-center py-5">
+                  <i className="fas fa-search fa-3x text-info mb-3"></i>
                   <h2>Search Page</h2>
-                  <p>Page de recherche en cours de développement.</p>
-                  <a href="/" className="btn btn-primary">Retour à l'accueil</a>
+                  <p className="text-muted">Page de recherche en cours de développement.</p>
+                  <a href="/" className="btn btn-primary">
+                    <i className="fas fa-home me-2"></i>
+                    Retour à l'accueil
+                  </a>
                 </div>
               } />
               
               <Route path="/browse" element={
-                <div className="container mt-5 text-center">
+                <div className="container mt-5 text-center py-5">
+                  <i className="fas fa-compass fa-3x text-success mb-3"></i>
                   <h2>Browse Page</h2>
-                  <p>Page de navigation en cours de développement.</p>
-                  <a href="/" className="btn btn-primary">Retour à l'accueil</a>
+                  <p className="text-muted">Page de navigation en cours de développement.</p>
+                  <a href="/" className="btn btn-primary">
+                    <i className="fas fa-home me-2"></i>
+                    Retour à l'accueil
+                  </a>
+                </div>
+              } />
+              
+              <Route path="/genres" element={
+                <div className="container mt-5 text-center py-5">
+                  <i className="fas fa-tags fa-3x text-warning mb-3"></i>
+                  <h2>All Genres</h2>
+                  <p className="text-muted">Page de tous les genres en cours de développement.</p>
+                  <a href="/" className="btn btn-primary">
+                    <i className="fas fa-home me-2"></i>
+                    Retour à l'accueil
+                  </a>
                 </div>
               } />
               
               <Route path="/popular" element={
-                <div className="container mt-5 text-center">
+                <div className="container mt-5 text-center py-5">
+                  <i className="fas fa-fire fa-3x text-danger mb-3"></i>
                   <h2>Popular Manga</h2>
-                  <p>Page des manga populaires en cours de développement.</p>
-                  <a href="/" className="btn btn-primary">Retour à l'accueil</a>
+                  <p className="text-muted">Page des manga populaires en cours de développement.</p>
+                  <a href="/" className="btn btn-primary">
+                    <i className="fas fa-home me-2"></i>
+                    Retour à l'accueil
+                  </a>
                 </div>
               } />
               
               <Route path="/latest" element={
-                <div className="container mt-5 text-center">
+                <div className="container mt-5 text-center py-5">
+                  <i className="fas fa-clock fa-3x text-info mb-3"></i>
                   <h2>Latest Updates</h2>
-                  <p>Page des dernières mises à jour en cours de développement.</p>
-                  <a href="/" className="btn btn-primary">Retour à l'accueil</a>
+                  <p className="text-muted">Page des dernières mises à jour en cours de développement.</p>
+                  <a href="/" className="btn btn-primary">
+                    <i className="fas fa-home me-2"></i>
+                    Retour à l'accueil
+                  </a>
                 </div>
               } />
               
               <Route path="/new" element={
-                <div className="container mt-5 text-center">
+                <div className="container mt-5 text-center py-5">
+                  <i className="fas fa-star fa-3x text-success mb-3"></i>
                   <h2>New Series</h2>
-                  <p>Page des nouvelles séries en cours de développement.</p>
-                  <a href="/" className="btn btn-primary">Retour à l'accueil</a>
+                  <p className="text-muted">Page des nouvelles séries en cours de développement.</p>
+                  <a href="/" className="btn btn-primary">
+                    <i className="fas fa-home me-2"></i>
+                    Retour à l'accueil
+                  </a>
                 </div>
               } />
               
-              <Route path="/login" element={
-                <div className="container mt-5 text-center">
-                  <h2>Login Page</h2>
-                  <p>Page de connexion en cours de développement.</p>
-                  <a href="/" className="btn btn-primary">Retour à l'accueil</a>
+              <Route path="/favorites" element={
+                <div className="container mt-5 text-center py-5">
+                  <i className="fas fa-heart fa-3x text-danger mb-3"></i>
+                  <h2>My Favorites</h2>
+                  <p className="text-muted">Page des favoris en cours de développement.</p>
+                  <a href="/" className="btn btn-primary">
+                    <i className="fas fa-home me-2"></i>
+                    Retour à l'accueil
+                  </a>
                 </div>
               } />
               
-              <Route path="/register" element={
-                <div className="container mt-5 text-center">
-                  <h2>Register Page</h2>
-                  <p>Page d'inscription en cours de développement.</p>
-                  <a href="/" className="btn btn-primary">Retour à l'accueil</a>
+              <Route path="/history" element={
+                <div className="container mt-5 text-center py-5">
+                  <i className="fas fa-history fa-3x text-info mb-3"></i>
+                  <h2>Reading History</h2>
+                  <p className="text-muted">Page de l'historique en cours de développement.</p>
+                  <a href="/" className="btn btn-primary">
+                    <i className="fas fa-home me-2"></i>
+                    Retour à l'accueil
+                  </a>
+                </div>
+              } />
+              
+              <Route path="/profile" element={
+                <div className="container mt-5 text-center py-5">
+                  <i className="fas fa-user-circle fa-3x text-primary mb-3"></i>
+                  <h2>User Profile</h2>
+                  <p className="text-muted">Page de profil utilisateur en cours de développement.</p>
+                  <a href="/" className="btn btn-primary">
+                    <i className="fas fa-home me-2"></i>
+                    Retour à l'accueil
+                  </a>
                 </div>
               } />
               
               {/* 404 Route */}
               <Route path="*" element={
-                <div className="container mt-5 text-center">
+                <div className="container mt-5 text-center py-5">
+                  <i className="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
                   <h1>404 - Page Not Found</h1>
-                  <p>The page you're looking for doesn't exist.</p>
-                  <a href="/" className="btn btn-primary">Go Home</a>
+                  <p className="text-muted">The page you're looking for doesn't exist.</p>
+                  <a href="/" className="btn btn-primary">
+                    <i className="fas fa-home me-2"></i>
+                    Go Home
+                  </a>
                 </div>
               } />
             </Routes>

@@ -86,7 +86,7 @@ const mockMangaData = [
     artist: "Hajime Isayama",
     description: "Humanity fights for survival against giant humanoid Titans behind three concentric walls.",
     status: "completed",
-    cover_image: "https://via.placeholder.com/300x400/dc3545/ffffff?text=Attack+on+Titan",
+    cover_image: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300&h=400",
     rating: 9.2,
     total_chapters: 139,
     genres: [
@@ -110,7 +110,7 @@ const mockMangaData = [
     artist: "Eiichiro Oda",
     description: "Follow Monkey D. Luffy and his crew as they search for the legendary treasure known as One Piece.",
     status: "ongoing",
-    cover_image: "https://via.placeholder.com/300x400/007bff/ffffff?text=One+Piece",
+    cover_image: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300&h=400",
     rating: 9.5,
     total_chapters: 1100,
     genres: [
@@ -134,7 +134,7 @@ const mockMangaData = [
     artist: "Masashi Kishimoto",
     description: "The story of Naruto Uzumaki, a young ninja who seeks recognition from his peers and dreams of becoming the Hokage.",
     status: "completed",
-    cover_image: "https://via.placeholder.com/300x400/fd7e14/ffffff?text=Naruto",
+    cover_image: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300&h=400",
     rating: 8.8,
     total_chapters: 700,
     genres: [
@@ -158,7 +158,7 @@ const mockMangaData = [
     artist: "Koyoharu Gotouge",
     description: "Tanjiro Kamado becomes a demon slayer to save his sister Nezuko who was turned into a demon.",
     status: "completed",
-    cover_image: "https://via.placeholder.com/300x400/17a2b8/ffffff?text=Demon+Slayer",
+    cover_image: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300&h=400",
     rating: 8.9,
     total_chapters: 205,
     genres: [
@@ -182,7 +182,7 @@ const mockMangaData = [
     artist: "Kohei Horikoshi",
     description: "In a world where most people have superpowers called Quirks, Izuku Midoriya dreams of becoming a hero despite being born without one.",
     status: "ongoing",
-    cover_image: "https://via.placeholder.com/300x400/28a745/ffffff?text=My+Hero+Academia",
+    cover_image: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300&h=400",
     rating: 8.7,
     total_chapters: 400,
     genres: [
@@ -206,7 +206,7 @@ const mockMangaData = [
     artist: "Gege Akutami",
     description: "Yuji Itadori joins a secret organization of Jujutsu Sorcerers to eliminate cursed spirits and find all fingers of Ryomen Sukuna.",
     status: "ongoing",
-    cover_image: "https://via.placeholder.com/300x400/6610f2/ffffff?text=Jujutsu+Kaisen",
+    cover_image: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300&h=400",
     rating: 9.0,
     total_chapters: 250,
     genres: [
@@ -290,9 +290,9 @@ export const mangaService = {
         chapter_number: 1,
         title: "Test Chapter",
         images: [
-          "https://via.placeholder.com/800x1200/007bff/ffffff?text=Page+1",
-          "https://via.placeholder.com/800x1200/28a745/ffffff?text=Page+2",
-          "https://via.placeholder.com/800x1200/dc3545/ffffff?text=Page+3"
+          "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300&h=400",
+          "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300&h=400",
+          "https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=300&h=400"
         ],
         page_count: 3,
         is_published: true,
