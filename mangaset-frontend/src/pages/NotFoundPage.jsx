@@ -33,7 +33,8 @@ const NotFoundPage = () => {
                   <Button 
                     variant="primary" 
                     size="lg"
-                    onClick={goBack}
+                    // onClick={goBack}
+                    href="/"
                   >
                     <i className="fas fa-arrow-left me-2"></i>
                     Retour
@@ -48,14 +49,14 @@ const NotFoundPage = () => {
                     Accueil
                   </Button>
                   
-                  <Button 
+                  {/* <Button 
                     variant="outline-secondary" 
                     size="lg"
                     href="/search"
                   >
                     <i className="fas fa-search me-2"></i>
                     Rechercher
-                  </Button>
+                  </Button> */}
                 </div>
               </div>
 

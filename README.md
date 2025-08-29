@@ -1,7 +1,7 @@
 # 📚 Manga Set Web
 
-Manga Set Web is a React-based application that allows users to search for mangas, explore manga details, and view chapters using the [MangaDex API](https://api.mangadex.org/).  
-The app is styled with **Tailwind CSS** and deployed on **Vercel/Netlify**.
+Manga Set Web is a React-based application that allows users to search for mangas, explore manga details, and view chapters.  
+The app is styled with **Bootstrap** and deployed on **Vercel/Netlify**.
 
 ---
 

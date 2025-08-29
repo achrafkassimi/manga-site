@@ -243,8 +243,9 @@ function App() {
       <AuthProvider>
         {/* <ErrorBoundary> */}
           <div className="App d-flex flex-column min-vh-100">
-            <ScrollToTop />
+            {/* <ScrollToTop /> */}
             <NavigationBar />
+            <br />
             
             <main className="flex-grow-1">
               <Routes>
