@@ -1,0 +1,217 @@
+/* src/pages/ReaderPage.css */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.reader-container {
+  min-height: 100vh;
+  background-color: #1a1a1a;
+}
+
+/* Loading State */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-size: 20px;
+  color: #666;
+  background-color: #f5f5f5;
+}
+
+/* Header */
+.reader-header {
+  position: sticky;
+  top: 0;
+  background-color: #2a2a2a;
+  color: white;
+  padding: 15px 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  z-index: 100;
+}
+
+.reader-header h1 {
+  font-size: 18px;
+  font-weight: normal;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+/* Navigation */
+.reader-nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+}
+
+.nav-btn {
+  padding: 8px 16px;
+  background-color: #3a3a3a;
+  color: white;
+  border: 1px solid #4a4a4a;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.nav-btn:hover:not(:disabled) {
+  background-color: #4a4a4a;
+  border-color: #5a5a5a;
+}
+
+.nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.nav-btn.large {
+  padding: 12px 24px;
+  font-size: 16px;
+}
+
+.chapter-select {
+  padding: 8px 12px;
+  background-color: #3a3a3a;
+  color: white;
+  border: 1px solid #4a4a4a;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  min-width: 120px;
+}
+
+.chapter-select:focus {
+  outline: none;
+  border-color: #5a5a5a;
+}
+
+/* Images Container */
+.images-container {
+  max-width: 900px;
+  margin: 0 auto;
+  background-color: #0a0a0a;
+  min-height: calc(100vh - 200px);
+}
+
+.page-wrapper {
+  display: block;
+  line-height: 0;
+}
+
+.manga-page {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Footer */
+.reader-footer {
+  background-color: #2a2a2a;
+  color: white;
+  padding: 30px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 30px;
+  border-top: 1px solid #3a3a3a;
+}
+
+.chapter-info {
+  font-size: 14px;
+  color: #999;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .reader-header h1 {
+    font-size: 16px;
+  }
+
+  .reader-nav {
+    gap: 10px;
+  }
+
+  .nav-btn {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+
+  .chapter-select {
+    min-width: 100px;
+    font-size: 13px;
+  }
+
+  .reader-footer {
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+  }
+
+  .nav-btn.large {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .chapter-info {
+    order: -1;
+  }
+}
+
+/* Dark Reader Theme */
+@media (prefers-color-scheme: light) {
+  .reader-container {
+    background-color: #f5f5f5;
+  }
+
+  .reader-header {
+    background-color: white;
+    color: #333;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .reader-header h1 {
+    color: #333;
+  }
+
+  .nav-btn {
+    background-color: #f8f8f8;
+    color: #333;
+    border-color: #ddd;
+  }
+
+  .nav-btn:hover:not(:disabled) {
+    background-color: #e8e8e8;
+    border-color: #ccc;
+  }
+
+  .chapter-select {
+    background-color: #f8f8f8;
+    color: #333;
+    border-color: #ddd;
+  }
+
+  .images-container {
+    background-color: white;
+  }
+
+  .reader-footer {
+    background-color: white;
+    color: #333;
+    border-top-color: #ddd;
+  }
+
+  .chapter-info {
+    color: #666;
+  }
+}

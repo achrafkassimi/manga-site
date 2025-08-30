@@ -275,6 +275,8 @@ function App() {
                 {/* Manga & Reading */}
                 <Route path="/manga/:slug" element={<MangaDetailsPage />} />
                 <Route path="/read/:slug/:chapterId" element={<ReaderPage />} />
+                {/* <Route path="/read/:mangaId/:chapterId" element={<ReaderPage />} />
+                <Route path="/manga/:mangaSlug/:chapterNumber/" element={<ReaderPage />} /> */}
                 
                 {/* ===== AUTHENTICATION ===== */}
                 
