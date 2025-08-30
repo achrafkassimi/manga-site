@@ -220,6 +220,11 @@ import Footer from './components/common/Footer'
 import ScrollToTop from './components/common/ScrollToTop'
 import ProtectedRoute from './components/common/ProtectedRoute'
 
+import UserDashboard from './components/user/UserProfilePage'
+import LoginForm from './components/user/LoginForm'
+import RegisterForm from './components/user/RegisterForm'
+import UserProfile from './components/user/UserProfilePage'
+
 // Main Pages
 import HomePage from './pages/HomePage'
 import SearchPage from './pages/SearchPage'
@@ -243,7 +248,7 @@ function App() {
       <AuthProvider>
         {/* <ErrorBoundary> */}
           <div className="App d-flex flex-column min-vh-100">
-            {/* <ScrollToTop /> */}
+            <ScrollToTop />
             <NavigationBar />
             <br />
             
@@ -274,9 +279,11 @@ function App() {
                 {/* ===== AUTHENTICATION ===== */}
                 
                 {/* Auth pages */}
-                <Route path="/auth" element={<AuthPage />} />
-                <Route path="/login" element={<AuthPage />} />
-                <Route path="/register" element={<AuthPage />} />
+                <Route path="/login" element={<LoginForm />} />
+                <Route path="/register" element={<RegisterForm />} />
+                <Route path="/profile/:tab?" element={<UserProfilePage />} />
+                <Route path="/profile" element={<UserProfile />} />
+                <Route path="/dashboard" element={<UserDashboard />} />
                 
                 {/* ===== USER PROTECTED ROUTES ===== */}
                 
@@ -330,6 +337,8 @@ function App() {
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </main>
+
+            <br />
             
             <Footer />
             
