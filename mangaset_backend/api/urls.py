@@ -1,5 +1,5 @@
 from django.urls import path
-# from mangaset_backend.api import admin_views
+from api import admin_views
 from . import views
 
 
@@ -32,8 +32,8 @@ urlpatterns = [
 
         # Admin endpoints
     # path('admin/dashboard/stats/', views.admin_dashboard_stats, name='admin-dashboard-stats'),
-    # path('admin/manga/', admin_views.AdminMangaListView.as_view(), name='admin-manga-list'),
-    # path('admin/manga/<slug:slug>/', admin_views.AdminMangaDetailView.as_view(), name='admin-manga-detail'),
-    # path('admin/manga/bulk-actions/', admin_views.bulk_manga_actions, name='admin-bulk-actions'),
-    # path('admin/users/', admin_views.AdminUserListView.as_view(), name='admin-users'),
+    path('admin/manga/', admin_views.AdminMangaListView.as_view(), name='admin-manga-list'),
+    path('admin/manga/<slug:slug>/', admin_views.AdminMangaDetailView.as_view(), name='admin-manga-detail'),
+    path('admin/manga/bulk-actions/', admin_views.bulk_manga_actions, name='admin-bulk-actions'),
+    path('admin/users/', admin_views.AdminUserListView.as_view(), name='admin-users'),
 ]

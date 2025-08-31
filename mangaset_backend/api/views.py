@@ -553,7 +553,7 @@ class MangaListView(generics.ListAPIView):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['status', 'genres__name']
     search_fields = ['title', 'author', 'description']
-    ordering_fields = ['created_at', 'updated_at', 'rating', 'view_count']
+    ordering_fields = ['created_at', 'updated_at', 'average_rating', 'view_count']
     ordering = ['-updated_at']
 
 class MangaDetailView(generics.RetrieveAPIView):
@@ -587,14 +587,15 @@ class PopularMangaView(generics.ListAPIView):
     permission_classes = [AllowAny]
     
     def get_queryset(self):
-        return Manga.objects.order_by('-view_count', '-rating')[:20]
+        return Manga.objects.order_by('-view_count', '-average_rating')[:20]  # Changed from 'rating' to 'average_rating'
 
 class FeaturedMangaView(generics.ListAPIView):
     serializer_class = MangaListSerializer
     permission_classes = [AllowAny]
     
     def get_queryset(self):
-        return Manga.objects.filter(is_featured=True).order_by('-updated_at')[:10]
+        return Manga.objects.filter(average_rating__gte=8.0).order_by('-average_rating')[:10]  # Changed from 'rating' to 'average_rating'
+
 
 class LatestUpdatesView(generics.ListAPIView):
     serializer_class = MangaListSerializer
@@ -722,7 +723,7 @@ class MangaSearchView(generics.ListAPIView):
             Q(author__icontains=query) |
             Q(description__icontains=query) |
             Q(genres__name__icontains=query)
-        ).distinct().order_by('-view_count', '-rating')
+        ).distinct().order_by('-view_count')
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

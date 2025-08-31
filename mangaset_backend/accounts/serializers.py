@@ -29,21 +29,28 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         return attrs
     
     def create(self, validated_data):
-        validated_data.pop('password_confirm')
-        user = User.objects.create_user(**validated_data)
+        user = User.objects.create_user(
+            username=validated_data['username'],
+            email=validated_data['email'],
+            password=validated_data['password'],
+            first_name=validated_data['first_name'],
+            last_name=validated_data['last_name']
+        )
+        print(validated_data)
+        # print(user) DETAIL:  La ligne en échec contient (10, 2025-08-31 18:50:27.218876+00, user_register, New user registered: hhhhhyy, null, null, {"email": "hhhhhyy@example.com"}, info, 23, null, null).
         return user
 
 class UserProfileSerializer(serializers.ModelSerializer):
-    reading_stats = serializers.SerializerMethodField()
+    # reading_stats = serializers.SerializerMethodField()
     
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'first_name', 'last_name', 'date_joined', 'reading_stats')
-        read_only_fields = ('id', 'date_joined', 'reading_stats')
+        fields = ('id', 'username', 'email', 'first_name', 'last_name', 'date_joined')
+        read_only_fields = ('id', 'date_joined')
     
-    def get_reading_stats(self, obj):
-        from manga.models import UserFavorite, ReadingHistory
-        return {
-            'favorites_count': UserFavorite.objects.filter(user=obj).count(),
-            'reading_history_count': ReadingHistory.objects.filter(user=obj).count(),
-        }
+    # def get_reading_stats(self, obj):
+    #     from manga.models import UserFavorite, ReadingHistory
+    #     return {
+    #         'favorites_count': UserFavorite.objects.filter(user=obj).count(),
+    #         'reading_history_count': ReadingHistory.objects.filter(user=obj).count(),
+    #     }

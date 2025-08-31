@@ -6,7 +6,8 @@ from django.db.models import Count, Q, Avg
 from django.utils import timezone
 from datetime import timedelta
 from manga.models import Manga, Chapter, Genre
-from .serializers import MangaDetailSerializer, UserProfileSerializer
+from .serializers import MangaDetailSerializer
+# , UserProfileSerializer
 import logging
 
 logger = logging.getLogger(__name__)
@@ -33,7 +34,7 @@ class AdminMangaDetailView(generics.RetrieveUpdateDestroyAPIView):
 # Admin User Management
 class AdminUserListView(generics.ListAPIView):
     queryset = User.objects.all()
-    serializer_class = UserProfileSerializer
+    # serializer_class = UserProfileSerializer
     permission_classes = [IsAdminUser]
 
 @api_view(['GET'])
