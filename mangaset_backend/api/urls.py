@@ -1,6 +1,7 @@
-# api/urls.py
 from django.urls import path
+from mangaset_backend.api import admin_views
 from . import views
+
 
 urlpatterns = [
     # Manga endpoints
@@ -17,7 +18,10 @@ urlpatterns = [
     # Chapter endpoints
     path('chapters/<int:pk>/', views.ChapterDetailView.as_view(), name='chapter-detail'),
     
-    # User endpoints
+    # Genre endpoints
+    path('genres/', views.GenreListView.as_view(), name='genre-list'),
+    
+    # User endpoints (move to separate app later)
     path('user/favorites/', views.UserFavoritesView.as_view(), name='user-favorites'),
     path('user/favorites/<int:pk>/', views.UserFavoriteDetailView.as_view(), name='user-favorite-detail'),
     path('user/history/', views.UserReadingHistoryView.as_view(), name='user-history'),
@@ -25,4 +29,11 @@ urlpatterns = [
     
     # Search
     path('search/', views.MangaSearchView.as_view(), name='manga-search'),
+
+        # Admin endpoints
+    path('admin/dashboard/stats/', views.admin_dashboard_stats, name='admin-dashboard-stats'),
+    path('admin/manga/', admin_views.AdminMangaListView.as_view(), name='admin-manga-list'),
+    path('admin/manga/<slug:slug>/', admin_views.AdminMangaDetailView.as_view(), name='admin-manga-detail'),
+    path('admin/manga/bulk-actions/', admin_views.bulk_manga_actions, name='admin-bulk-actions'),
+    path('admin/users/', admin_views.AdminUserListView.as_view(), name='admin-users'),
 ]
