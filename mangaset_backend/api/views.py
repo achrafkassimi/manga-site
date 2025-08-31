@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Q, Count, Avg
-from manga.models import Manga, Chapter, Genre, UserFavorite, ReadingHistory
+from mangaset_backend.manga.models import Manga, Chapter, Genre, UserFavorite, ReadingHistory
 from .serializers import *
 
 # Manga Views

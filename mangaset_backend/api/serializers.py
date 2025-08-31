@@ -1,7 +1,7 @@
 # api/serializers.py
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from manga.models import Manga, Chapter, Genre, UserFavorite, ReadingHistory
+from mangaset_backend.manga.models import Manga, Chapter, Genre, UserFavorite, ReadingHistory
 
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
