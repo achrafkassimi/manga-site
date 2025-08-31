@@ -26,8 +26,8 @@ class MangaListSerializer(serializers.ModelSerializer):
         model = Manga
         fields = [
             'id', 'title', 'slug', 'description', 'author', 'artist', 
-            'status', 'cover_image', 'rating', 'total_chapters', 
-            'genres', 'latest_chapter', 'created_at', 'updated_at'
+            'status', 'cover_image', 'average_rating', 'total_ratings', 'total_chapters', 
+            'genres', 'latest_chapter', 'view_count', 'created_at', 'updated_at'
         ]
     
     def get_latest_chapter(self, obj):

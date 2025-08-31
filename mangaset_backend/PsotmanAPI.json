@@ -1,0 +1,530 @@
+{
+  "info": {
+    "name": "Manga Set API - Complete Test Collection",
+    "description": "Comprehensive testing collection for all Manga Set API endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000/api",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "manga_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "chapter_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "01 - Authentication",
+      "item": [
+        {
+          "name": "User Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (responseCode.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('access_token', jsonData.access);",
+                  "    pm.test('Login successful', function () {",
+                  "        pm.expect(jsonData.access).to.be.a('string');",
+                  "    });",
+                  "} else {",
+                  "    pm.test('Login failed', function () {",
+                  "        pm.expect.fail('Authentication failed');",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"john_doe\",\n    \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login/",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Token Refresh",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"refresh\": \"{{refresh_token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/refresh/",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "refresh", ""]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "02 - Manga Management",
+      "item": [
+        {
+          "name": "List All Manga",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has results', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('results');",
+                  "    if (jsonData.results.length > 0) {",
+                  "        pm.collectionVariables.set('manga_id', jsonData.results[0].id);",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/manga/",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "manga", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Manga Details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/manga/dragon-quest-chronicles/",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "manga", "dragon-quest-chronicles", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Manga Chapters",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (responseCode.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    if (jsonData.length > 0) {",
+                  "        pm.collectionVariables.set('chapter_id', jsonData[0].id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/manga/dragon-quest-chronicles/chapters/",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "manga", "dragon-quest-chronicles", "chapters", ""]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "03 - Special Manga Lists",
+      "item": [
+        {
+          "name": "Popular Manga",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/manga/lists/popular/",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "manga", "lists", "popular", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Featured Manga",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/manga/lists/featured/",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "manga", "lists", "featured", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Latest Updates",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/manga/lists/latest/",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "manga", "lists", "latest", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "New Series",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/manga/lists/new/",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "manga", "lists", "new", ""]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "04 - Chapters",
+      "item": [
+        {
+          "name": "Get Chapter Details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/chapters/{{chapter_id}}/",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "chapters", "{{chapter_id}}", ""]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "05 - Genres",
+      "item": [
+        {
+          "name": "List All Genres",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/genres/",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "genres", ""]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "06 - Search",
+      "item": [
+        {
+          "name": "Search Manga - Dragon",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/search/?q=dragon",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "search", ""],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "dragon"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search Manga - Romance",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/search/?q=romance",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "search", ""],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "romance"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Advanced Search with Filters",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/manga/?status=ongoing&genres__name=Action&ordering=-average_rating",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "manga", ""],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "ongoing"
+                },
+                {
+                  "key": "genres__name",
+                  "value": "Action"
+                },
+                {
+                  "key": "ordering",
+                  "value": "-average_rating"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "07 - User Features (Authenticated)",
+      "item": [
+        {
+          "name": "Get User Favorites",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/v1/user/favorites/",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "user", "favorites", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add to Favorites",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"manga_id\": {{manga_id}}\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/user/favorites/",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "user", "favorites", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Reading History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/v1/user/history/",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "user", "history", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Reading Progress",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"manga_id\": {{manga_id}},\n    \"chapter_id\": {{chapter_id}},\n    \"last_page\": 15,\n    \"progress_percentage\": 75.0\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/user/reading-progress/",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "user", "reading-progress", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/v1/user/stats/",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "user", "stats", ""]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "08 - Error Testing",
+      "item": [
+        {
+          "name": "Non-existent Manga",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/manga/non-existent-manga/",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "manga", "non-existent-manga", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Unauthorized Access",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/user/favorites/",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "user", "favorites", ""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Invalid Search Query",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/search/",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "search", ""]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "09 - Admin Tests (if implemented)",
+      "item": [
+        {
+          "name": "Get System Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}/v1/admin/stats/",
+              "host": ["{{base_url}}"],
+              "path": ["v1", "admin", "stats", ""]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
