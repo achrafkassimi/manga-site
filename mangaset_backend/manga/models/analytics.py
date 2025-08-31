@@ -76,7 +76,7 @@ class BookmarkPage(TimeStampedModel):
     is_private = models.BooleanField(default=False)
     
     # Additional fields
-    bookmark_type = models.CharField(max_length=20, choices=[
+    bookmark_type = models.CharField(max_length=254, choices=[
         ('favorite_scene', 'Favorite Scene'),
         ('important_plot', 'Important Plot Point'),
         ('funny_moment', 'Funny Moment'),
