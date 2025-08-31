@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     
     # Local apps
     'manga',
-    'accounts',
+    'accounts',  # Make sure this is here
     'api',
 ]
 
