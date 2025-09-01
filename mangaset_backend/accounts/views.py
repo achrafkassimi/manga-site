@@ -243,14 +243,47 @@ from .models import PasswordResetToken
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
-# User Registration
+# accounts/views.py - SOLUTION 3 (PLUS COMPLÈTE)
+
+# Ajouter une fonction utilitaire en haut du fichier
+def get_client_info(request):
+    """Extract client IP and user agent from request"""
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    
+    user_agent = request.META.get('HTTP_USER_AGENT', 'Unknown')
+    
+    return ip, user_agent
+
+# Modifier la vue register_view:
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
 def register_view(request):
     """Register a new user account"""
     serializer = UserRegistrationSerializer(data=request.data)
     if serializer.is_valid():
+        # Capturer les infos client AVANT de sauvegarder l'utilisateur
+        ip_address, user_agent = get_client_info(request)
+        
+        # Sauvegarder avec les infos client dans le contexte
         user = serializer.save()
+        
+        # Log la registration avec les bonnes infos
+        from manga.models.admin_models import ActivityLog
+        from manga.models.base import ActivityType
+        
+        ActivityLog.log(
+            action_type=ActivityType.USER_REGISTER,
+            description=f'New user registered: {user.username}',
+            user=user,
+            ip_address=ip_address,
+            user_agent=user_agent,
+            metadata={'email': user.email}
+        )
+        
         refresh = RefreshToken.for_user(user)
         
         return Response({
@@ -267,7 +300,7 @@ def register_view(request):
         'details': serializer.errors
     }, status=status.HTTP_400_BAD_REQUEST)
 
-# User Login
+# Modifier la vue login_view aussi:
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])  
 def login_view(request):
@@ -295,6 +328,20 @@ def login_view(request):
         # Update last login
         user.last_login = timezone.now()
         user.save(update_fields=['last_login'])
+        
+        # Log login activity avec user_agent
+        ip_address, user_agent = get_client_info(request)
+        from manga.models.admin_models import ActivityLog
+        from manga.models.base import ActivityType
+        
+        ActivityLog.log(
+            action_type=ActivityType.USER_LOGIN,
+            description=f'User login: {user.username}',
+            user=user,
+            ip_address=ip_address,
+            user_agent=user_agent,
+            metadata={'login_method': 'email' if '@' in username else 'username'}
+        )
         
         refresh = RefreshToken.for_user(user)
         return Response({

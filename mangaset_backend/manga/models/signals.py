@@ -210,6 +210,9 @@ def handle_rating_creation(sender, instance, created, **kwargs):
 # USER ACTIVITY TRACKING SIGNALS
 # ============================================================================
 
+# manga/models/signals.py - SOLUTION 1 (RECOMMANDÉE)
+
+# Remplacer cette fonction:
 @receiver(post_save, sender=User)
 def log_user_registration(sender, instance, created, **kwargs):
     """Log user registration"""
@@ -221,6 +224,7 @@ def log_user_registration(sender, instance, created, **kwargs):
             action_type=ActivityType.USER_REGISTER,
             description=f'New user registered: {instance.username}',
             user=instance,
+            user_agent='Django System',  # ✅ AJOUT: user_agent par défaut
             metadata={'email': instance.email}
         )
 

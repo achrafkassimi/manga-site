@@ -94,7 +94,7 @@ class ActivityLog(TimeStampedModel):
     action_type = models.CharField(max_length=50, choices=ActivityType.CHOICES)
     description = models.TextField()
     ip_address = models.GenericIPAddressField(null=True, blank=True)
-    user_agent = models.TextField(max_length=500, blank=True)
+    user_agent = models.TextField(max_length=500, blank=True, default='')
     
     # Related objects
     manga = models.ForeignKey('manga.Manga', on_delete=models.SET_NULL, null=True, blank=True)
@@ -134,7 +134,7 @@ class ActivityLog(TimeStampedModel):
             manga=manga,
             chapter=chapter,
             ip_address=ip_address,
-            user_agent=user_agent,
+            user_agent=user_agent or 'System',
             metadata=metadata or {},
             severity=severity
         )
