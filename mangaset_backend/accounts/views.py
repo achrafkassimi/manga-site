@@ -62,16 +62,39 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class UserRegistrationView(generics.CreateAPIView):
     queryset = User.objects.all()
     permission_classes = [permissions.AllowAny]
     serializer_class = UserRegistrationSerializer
     
-    def create(self, request):
+    def create(self, request, *args, **kwargs):
         try:
+            # Temporarily disconnect the problematic signal
+            from django.db.models.signals import post_save
+            from manga.models.signals import log_user_registration
+            
+            post_save.disconnect(log_user_registration, sender=User)
+            
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             user = serializer.save()
+            
+            # Manually create activity log with proper user_agent
+            from manga.models.admin_models import ActivityLog
+            from manga.models.base import ActivityType
+            
+            ActivityLog.log(
+                action_type=ActivityType.USER_REGISTER,
+                description=f'New user registered: {user.username}',
+                user=user,
+                user_agent=request.META.get('HTTP_USER_AGENT', 'API Registration'),
+                ip_address=self.get_client_ip(request),
+                metadata={'email': user.email}
+            )
+            
+            # Reconnect the signal
+            post_save.connect(log_user_registration, sender=User)
             
             # Generate tokens
             refresh = RefreshToken.for_user(user)
@@ -87,10 +110,22 @@ class UserRegistrationView(generics.CreateAPIView):
             
         except Exception as e:
             logger.error(f"Registration error: {str(e)}")
+            # Make sure to reconnect signal even if error occurs
+            post_save.connect(log_user_registration, sender=User)
             return Response({
                 'error': 'Registration failed',
                 'details': str(e)
             }, status=status.HTTP_400_BAD_REQUEST)
+    
+    def get_client_ip(self, request):
+        """Get client IP address"""
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(',')[0]
+        else:
+            ip = request.META.get('REMOTE_ADDR')
+        return ip
+    
 
 class UserProfileView(generics.RetrieveUpdateAPIView):
     serializer_class = UserProfileSerializer
