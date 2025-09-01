@@ -294,7 +294,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Logout function
+  // Logout function - FIXED VERSION
   const logout = async () => {
     try {
       const refreshToken = localStorage.getItem('refreshToken');
@@ -304,15 +304,21 @@ export const AuthProvider = ({ children }) => {
           await authAPI.post('/auth/logout/', {
             refresh: refreshToken
           });
+          console.log('✅ Server logout successful');
         } catch (error) {
-          console.warn('Logout API call failed:', error);
+          console.warn('⚠️ Server logout failed, but continuing with local logout:', error.response?.data || error.message);
+          // Continue with local logout even if server fails
         }
       }
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error('❌ Logout error:', error);
     } finally {
+      // Always clear local data regardless of server response
       clearAuthData();
       toast.success('Logged out successfully');
+      
+      // Optional: Redirect to login page
+      window.location.href = '/login';
     }
   };
 

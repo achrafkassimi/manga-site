@@ -214,7 +214,7 @@ const LoginForm = () => {
             )}
 
             {/* Social Login Section (Optional) */}
-            <div className="mb-4">
+            {/* <div className="mb-4">
               <Row className="g-2">
                 <Col xs={6}>
                   <Button
@@ -243,7 +243,7 @@ const LoginForm = () => {
               <div className="text-center my-3">
                 <span className="text-muted small">or sign in with your account</span>
               </div>
-            </div>
+            </div> */}
 
             {/* Login Form */}
             <Form onSubmit={handleSubmit} noValidate>
