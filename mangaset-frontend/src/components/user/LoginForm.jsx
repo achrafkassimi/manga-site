@@ -1,4 +1,4 @@
-// src/components/auth/LoginForm.jsx - Complete Login Form
+// src/components/auth/LoginForm.jsx - FIXED COMPLETE LOGIN FORM
 import React, { useState, useEffect } from 'react';
 import { 
   Form, 
@@ -8,21 +8,26 @@ import {
   InputGroup,
   Spinner,
   Row,
-  Col
+  Col,
+  Container
 } from 'react-bootstrap';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { toast } from 'react-toastify';
 
 const LoginForm = () => {
+  // State management
   const [formData, setFormData] = useState({
-    email: '',
+    username: '', // Changed from email to username to match backend
     password: '',
     rememberMe: false
   });
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [generalError, setGeneralError] = useState('');
 
+  // Auth context and navigation
   const { login, isAuthenticated, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -43,28 +48,31 @@ const LoginForm = () => {
       [name]: type === 'checkbox' ? checked : value
     }));
     
-    // Clear error when user starts typing
+    // Clear errors when user starts typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
+    if (generalError) {
+      setGeneralError('');
+    }
   };
 
-  // Validate form
+  // Form validation
   const validateForm = () => {
     const newErrors = {};
 
-    // Email validation
-    if (!formData.email) {
-      newErrors.email = 'L\'email est requis';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Format d\'email invalide';
+    // Username validation (can be email or username)
+    if (!formData.username.trim()) {
+      newErrors.username = 'Username or email is required';
+    } else if (formData.username.trim().length < 3) {
+      newErrors.username = 'Username must be at least 3 characters';
     }
 
     // Password validation
     if (!formData.password) {
-      newErrors.password = 'Le mot de passe est requis';
+      newErrors.password = 'Password is required';
     } else if (formData.password.length < 6) {
-      newErrors.password = 'Le mot de passe doit contenir au moins 6 caractères';
+      newErrors.password = 'Password must be at least 6 characters';
     }
 
     setErrors(newErrors);
@@ -75,233 +83,303 @@ const LoginForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!validateForm()) return;
+    // Validate form first
+    if (!validateForm()) {
+      return;
+    }
 
     setIsSubmitting(true);
+    setGeneralError('');
     
     try {
+      // Attempt login
       const result = await login({
-        email: formData.email,
+        username: formData.username.trim(),
         password: formData.password,
         remember_me: formData.rememberMe
       });
 
-      if (result.success) {
+      // Check if login was successful
+      if (result && result.success !== false) {
+        toast.success('Login successful! Welcome back!');
+        
+        // Navigate to intended destination
         const from = location.state?.from?.pathname || '/';
         navigate(from, { replace: true });
+      } else {
+        throw new Error(result?.error || 'Login failed');
       }
     } catch (error) {
       console.error('Login error:', error);
+      
+      // Handle different error types
+      let errorMessage = 'Login failed. Please try again.';
+      
+      if (error.message.includes('Invalid credentials')) {
+        errorMessage = 'Invalid username or password. Please check your credentials.';
+      } else if (error.message.includes('Network Error')) {
+        errorMessage = 'Unable to connect to server. Please check your connection.';
+      } else if (error.message.includes('429')) {
+        errorMessage = 'Too many login attempts. Please wait a moment and try again.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      setGeneralError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // Handle social login
-  const handleSocialLogin = async (provider) => {
-    try {
-      // Redirect to social auth endpoint
-      window.location.href = `/api/auth/social/${provider}`;
-    } catch (error) {
-      console.error('Social login error:', error);
-    }
-  };
-
-  // Demo login (for testing)
+  // Handle demo login for testing
   const handleDemoLogin = async () => {
     setFormData({
-      email: 'demo@mangaset.com',
-      password: 'demo123',
+      username: 'demo@mangaset.com',
+      password: 'demo123456',
       rememberMe: false
     });
     
-    // Auto-submit after a brief delay
-    setTimeout(() => {
-      handleSubmit({ preventDefault: () => {} });
+    // Clear any existing errors
+    setErrors({});
+    setGeneralError('');
+    
+    // Auto-submit after setting data
+    setTimeout(async () => {
+      try {
+        setIsSubmitting(true);
+        const result = await login({
+          username: 'demo@mangaset.com',
+          password: 'demo123456',
+          remember_me: false
+        });
+        
+        if (result && result.success !== false) {
+          toast.success('Demo login successful!');
+          navigate('/', { replace: true });
+        }
+      } catch (error) {
+        setGeneralError('Demo login failed. Please try manual login.');
+        toast.error('Demo login failed');
+      } finally {
+        setIsSubmitting(false);
+      }
     }, 500);
   };
 
+  // Social login handlers (placeholder for future implementation)
+  const handleSocialLogin = async (provider) => {
+    try {
+      toast.info(`${provider} login coming soon!`);
+      // TODO: Implement social login
+      // window.location.href = `/api/auth/social/${provider}/`;
+    } catch (error) {
+      console.error('Social login error:', error);
+      toast.error(`${provider} login failed`);
+    }
+  };
+
+  // Show loading spinner while checking auth status
   if (loading) {
     return (
-      <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
-        <Spinner animation="border" variant="primary" />
-      </div>
+      <Container className="d-flex justify-content-center align-items-center min-vh-100">
+        <div className="text-center">
+          <Spinner animation="border" variant="primary" size="lg" />
+          <p className="mt-3 text-muted">Checking authentication...</p>
+        </div>
+      </Container>
     );
   }
 
   return (
-    <div className="login-form-container">
-      <Card className="shadow-lg border-0">
-        <Card.Body className="p-5">
-          <div className="text-center mb-4">
-            <div className="mb-3">
-              <i className="fas fa-book-open fa-3x text-primary"></i>
+    <Container className="py-5">
+      <div className="login-form-container">
+        <Card className="shadow-lg border-0">
+          <Card.Body className="p-5">
+            {/* Header Section */}
+            <div className="text-center mb-4">
+              <div className="mb-3">
+                <i className="fas fa-book-open fa-3x text-primary"></i>
+              </div>
+              <h2 className="fw-bold mb-2">Welcome Back!</h2>
+              <p className="text-muted">Sign in to your MangaSet account</p>
             </div>
-            <h2 className="fw-bold mb-2">Connexion</h2>
-            <p className="text-muted">Connectez-vous à votre compte MangaSet</p>
-          </div>
 
-          {/* Social Login Options */}
-          <div className="mb-4">
-            <Row>
-              <Col xs={6}>
-                <Button
-                  variant="outline-danger"
-                  className="w-100 mb-2"
-                  onClick={() => handleSocialLogin('google')}
-                >
-                  <i className="fab fa-google me-2"></i>
-                  Google
-                </Button>
-              </Col>
-              <Col xs={6}>
-                <Button
-                  variant="outline-primary"
-                  className="w-100 mb-2"
-                  onClick={() => handleSocialLogin('discord')}
-                >
-                  <i className="fab fa-discord me-2"></i>
-                  Discord
-                </Button>
-              </Col>
-            </Row>
-            
-            <div className="text-center my-3">
-              <span className="text-muted">ou</span>
+            {/* General Error Alert */}
+            {generalError && (
+              <Alert variant="danger" dismissible onClose={() => setGeneralError('')}>
+                <i className="fas fa-exclamation-triangle me-2"></i>
+                {generalError}
+              </Alert>
+            )}
+
+            {/* Social Login Section (Optional) */}
+            <div className="mb-4">
+              <Row className="g-2">
+                <Col xs={6}>
+                  <Button
+                    variant="outline-danger"
+                    className="w-100"
+                    onClick={() => handleSocialLogin('google')}
+                    disabled={isSubmitting}
+                  >
+                    <i className="fab fa-google me-2"></i>
+                    Google
+                  </Button>
+                </Col>
+                <Col xs={6}>
+                  <Button
+                    variant="outline-primary"
+                    className="w-100"
+                    onClick={() => handleSocialLogin('discord')}
+                    disabled={isSubmitting}
+                  >
+                    <i className="fab fa-discord me-2"></i>
+                    Discord
+                  </Button>
+                </Col>
+              </Row>
+              
+              <div className="text-center my-3">
+                <span className="text-muted small">or sign in with your account</span>
+              </div>
             </div>
-          </div>
 
-          {/* Login Form */}
-          <Form onSubmit={handleSubmit}>
-            {/* Email Field */}
-            <Form.Group className="mb-3">
-              <Form.Label>
-                <i className="fas fa-envelope me-2"></i>
-                Email
-              </Form.Label>
-              <InputGroup>
-                <Form.Control
-                  type="email"
-                  name="email"
-                  placeholder="votre@email.com"
-                  value={formData.email}
+            {/* Login Form */}
+            <Form onSubmit={handleSubmit} noValidate>
+              {/* Username/Email Field */}
+              <Form.Group className="mb-3">
+                <Form.Label className="fw-semibold">
+                  <i className="fas fa-user me-2"></i>
+                  Username or Email
+                </Form.Label>
+                <InputGroup>
+                  <Form.Control
+                    type="text"
+                    name="username"
+                    placeholder="Enter your username or email"
+                    value={formData.username}
+                    onChange={handleChange}
+                    isInvalid={!!errors.username}
+                    disabled={isSubmitting}
+                    autoComplete="username"
+                    autoFocus
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.username}
+                  </Form.Control.Feedback>
+                </InputGroup>
+              </Form.Group>
+
+              {/* Password Field */}
+              <Form.Group className="mb-3">
+                <Form.Label className="fw-semibold">
+                  <i className="fas fa-lock me-2"></i>
+                  Password
+                </Form.Label>
+                <InputGroup>
+                  <Form.Control
+                    type={showPassword ? 'text' : 'password'}
+                    name="password"
+                    placeholder="Enter your password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    isInvalid={!!errors.password}
+                    disabled={isSubmitting}
+                    autoComplete="current-password"
+                  />
+                  <Button
+                    variant="outline-secondary"
+                    onClick={() => setShowPassword(!showPassword)}
+                    disabled={isSubmitting}
+                    type="button"
+                  >
+                    <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                  </Button>
+                  <Form.Control.Feedback type="invalid">
+                    {errors.password}
+                  </Form.Control.Feedback>
+                </InputGroup>
+              </Form.Group>
+
+              {/* Remember Me & Forgot Password */}
+              <div className="d-flex justify-content-between align-items-center mb-4">
+                <Form.Check
+                  type="checkbox"
+                  name="rememberMe"
+                  label="Remember me"
+                  checked={formData.rememberMe}
                   onChange={handleChange}
-                  isInvalid={!!errors.email}
                   disabled={isSubmitting}
                 />
-                <Form.Control.Feedback type="invalid">
-                  {errors.email}
-                </Form.Control.Feedback>
-              </InputGroup>
-            </Form.Group>
+                <Link 
+                  to="/forgot-password" 
+                  className="text-decoration-none text-primary small"
+                >
+                  Forgot password?
+                </Link>
+              </div>
 
-            {/* Password Field */}
-            <Form.Group className="mb-3">
-              <Form.Label>
-                <i className="fas fa-lock me-2"></i>
-                Mot de passe
-              </Form.Label>
-              <InputGroup>
-                <Form.Control
-                  type={showPassword ? 'text' : 'password'}
-                  name="password"
-                  placeholder="Votre mot de passe"
-                  value={formData.password}
-                  onChange={handleChange}
-                  isInvalid={!!errors.password}
-                  disabled={isSubmitting}
-                />
+              {/* Submit Button */}
+              <div className="d-grid gap-2 mb-3">
                 <Button
-                  variant="outline-secondary"
-                  onClick={() => setShowPassword(!showPassword)}
+                  type="submit"
+                  variant="primary"
+                  size="lg"
                   disabled={isSubmitting}
                 >
-                  <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+                  {isSubmitting ? (
+                    <>
+                      <Spinner
+                        as="span"
+                        animation="border"
+                        size="sm"
+                        role="status"
+                        aria-hidden="true"
+                        className="me-2"
+                      />
+                      Signing in...
+                    </>
+                  ) : (
+                    <>
+                      <i className="fas fa-sign-in-alt me-2"></i>
+                      Sign In
+                    </>
+                  )}
                 </Button>
-                <Form.Control.Feedback type="invalid">
-                  {errors.password}
-                </Form.Control.Feedback>
-              </InputGroup>
-            </Form.Group>
+              </div>
+            </Form>
 
-            {/* Remember Me & Forgot Password */}
-            <div className="d-flex justify-content-between align-items-center mb-4">
-              <Form.Check
-                type="checkbox"
-                name="rememberMe"
-                label="Se souvenir de moi"
-                checked={formData.rememberMe}
-                onChange={handleChange}
-                disabled={isSubmitting}
-              />
-              <Link 
-                to="/forgot-password" 
-                className="text-decoration-none text-primary"
-              >
-                Mot de passe oublié ?
-              </Link>
-            </div>
-
-            {/* Submit Button */}
-            <div className="d-grid gap-2 mb-4">
+            {/* Demo Login Button */}
+            {/* <div className="d-grid gap-2 mb-4">
               <Button
-                type="submit"
-                variant="primary"
-                size="lg"
+                variant="outline-success"
+                onClick={handleDemoLogin}
                 disabled={isSubmitting}
               >
-                {isSubmitting ? (
-                  <>
-                    <Spinner
-                      as="span"
-                      animation="border"
-                      size="sm"
-                      role="status"
-                      aria-hidden="true"
-                      className="me-2"
-                    />
-                    Connexion...
-                  </>
-                ) : (
-                  <>
-                    <i className="fas fa-sign-in-alt me-2"></i>
-                    Se connecter
-                  </>
-                )}
+                <i className="fas fa-play me-2"></i>
+                Try Demo Login
               </Button>
+            </div> */}
+
+            {/* Register Link */}
+            <div className="text-center">
+              <p className="text-muted mb-0">
+                Don't have an account?{' '}
+                <Link to="/register" className="text-decoration-none fw-bold text-primary">
+                  Create one now
+                </Link>
+              </p>
             </div>
-          </Form>
-
-          {/* Demo Login Button */}
-          <div className="d-grid gap-2 mb-4">
-            <Button
-              variant="outline-success"
-              onClick={handleDemoLogin}
-              disabled={isSubmitting}
-            >
-              <i className="fas fa-play me-2"></i>
-              Connexion démo
-            </Button>
-          </div>
-
-          {/* Register Link */}
-          <div className="text-center">
-            <p className="text-muted">
-              Pas encore de compte ?{' '}
-              <Link to="/register" className="text-decoration-none fw-bold">
-                Créer un compte
-              </Link>
-            </p>
-          </div>
-        </Card.Body>
-      </Card>
+          </Card.Body>
+        </Card>
+      </div>
 
       {/* Custom Styles */}
       <style jsx>{`
         .login-form-container {
           max-width: 450px;
           margin: 0 auto;
-          padding: 2rem 1rem;
         }
         
         .card {
@@ -310,8 +388,8 @@ const LoginForm = () => {
         }
         
         .card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 20px 40px rgba(0,0,0,0.1) !important;
+          transform: translateY(-2px);
+          box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important;
         }
         
         .form-control {
@@ -328,13 +406,12 @@ const LoginForm = () => {
         
         .btn {
           border-radius: 0.5rem;
-          padding: 0.75rem 1rem;
           font-weight: 500;
           transition: all 0.3s ease;
         }
         
-        .btn:hover {
-          transform: translateY(-2px);
+        .btn:hover:not(:disabled) {
+          transform: translateY(-1px);
         }
         
         .input-group .btn {
@@ -348,7 +425,7 @@ const LoginForm = () => {
         
         @media (max-width: 576px) {
           .login-form-container {
-            padding: 1rem 0.5rem;
+            margin: 1rem;
           }
           
           .card-body {
@@ -356,7 +433,7 @@ const LoginForm = () => {
           }
         }
       `}</style>
-    </div>
+    </Container>
   );
 };
 
