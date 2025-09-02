@@ -26,6 +26,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
     bio = serializers.CharField(source='profile.bio', required=False, allow_blank=True)
     avatar = serializers.ImageField(source='profile.avatar', required=False, allow_null=True)
+    avatar_url = serializers.SerializerMethodField()  # NOUVEAU: URL complète de l'avatar
     birth_date = serializers.DateField(source='profile.birth_date', required=False, allow_null=True)
     preferred_language = serializers.CharField(source='profile.preferred_language', required=False)
     
@@ -33,14 +34,26 @@ class UserProfileSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             'id', 'username', 'email', 'first_name', 'last_name', 
-            'full_name', 'bio', 'avatar', 'birth_date', 'preferred_language',
+            'full_name', 'bio', 'avatar', 'avatar_url', 'birth_date', 'preferred_language',
             'date_joined', 'last_login'
         ]
         read_only_fields = ['id', 'username', 'date_joined', 'last_login']
     
     def get_full_name(self, obj):
         return f"{obj.first_name} {obj.last_name}".strip() or obj.username
-    
+
+    def get_avatar_url(self, obj):
+        """Return the avatar URL if it exists"""
+        try:
+            if hasattr(obj, 'profile') and obj.profile and obj.profile.avatar:
+                request = self.context.get('request')
+                if request:
+                    return request.build_absolute_uri(obj.profile.avatar.url)
+                return obj.profile.avatar.url
+            return None
+        except:
+            return None
+        
     def update(self, instance, validated_data):
         # Update User fields
         instance.first_name = validated_data.get('first_name', instance.first_name)
@@ -52,8 +65,19 @@ class UserProfileSerializer(serializers.ModelSerializer):
         profile_data = validated_data.get('profile', {})
         if profile_data:
             profile, created = UserProfile.objects.get_or_create(user=instance)
+            
+            # Handle avatar upload
+            if 'avatar' in profile_data:
+                # Delete old avatar if exists
+                if profile.avatar:
+                    profile.avatar.delete()
+                profile.avatar = profile_data['avatar']
+            
+            # Update other profile fields
             for attr, value in profile_data.items():
-                setattr(profile, attr, value)
+                if attr != 'avatar':  # Skip avatar, already handled
+                    setattr(profile, attr, value)
+            
             profile.save()
         
         return instance

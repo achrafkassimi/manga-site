@@ -1,4 +1,4 @@
-// src/context/AuthContext.jsx - FIXED FOR VITE
+// src/context/AuthContext.jsx - FIXED FOR VITE WITH AVATAR SUPPORT
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import axios from 'axios';
@@ -322,26 +322,88 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Update profile function
+  // Update profile function with avatar support - UPDATED
   const updateProfile = async (profileData) => {
     try {
-      const response = await authAPI.put('/auth/profile/', profileData);
-      const updatedUser = response.data.user || response.data;
+      setLoading(true);
       
-      setUser(updatedUser);
-      localStorage.setItem('user', JSON.stringify(updatedUser));
+      // Prepare FormData for file upload
+      const formData = new FormData();
       
-      return { 
-        success: true, 
-        user: updatedUser, 
-        message: 'Profile updated successfully' 
-      };
+      // Add text fields
+      if (profileData.first_name) formData.append('first_name', profileData.first_name);
+      if (profileData.last_name) formData.append('last_name', profileData.last_name);
+      if (profileData.email) formData.append('email', profileData.email);
+      if (profileData.bio) formData.append('bio', profileData.bio);
+      if (profileData.preferred_language) formData.append('preferred_language', profileData.preferred_language);
+      
+      // Handle avatar file
+      if (profileData.avatar) {
+        if (profileData.avatar instanceof File) {
+          // Real file upload
+          formData.append('avatar', profileData.avatar);
+        } else if (typeof profileData.avatar === 'string' && profileData.avatar.startsWith('data:')) {
+          // Base64 string - send as is (let backend handle conversion)
+          formData.append('avatar', profileData.avatar);
+        }
+      }
+      
+      // Add preferences as JSON string
+      if (profileData.preferences) {
+        formData.append('preferences', JSON.stringify(profileData.preferences));
+      }
+      
+      const response = await authAPI.put('/auth/profile/', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      
+      if (response.data.user) {
+        const updatedUser = response.data.user;
+        setUser(updatedUser);
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        
+        return { 
+          success: true, 
+          user: updatedUser, 
+          message: response.data.message || 'Profile updated successfully'
+        };
+      }
+      
+      return { success: true, message: 'Profile updated successfully' };
       
     } catch (error) {
       console.error('Profile update error:', error);
+      throw new Error(error.response?.data?.error || 'Failed to update profile');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Change password function - ADDED
+  const changePassword = async (passwordData) => {
+    try {
+      setLoading(true);
+      
+      const response = await authAPI.post('/auth/change-password/', {
+        old_password: passwordData.old_password,
+        new_password: passwordData.new_password,
+        new_password_confirm: passwordData.new_password_confirm
+      });
+      
+      return { 
+        success: true, 
+        message: response.data.message || 'Password changed successfully'
+      };
+      
+    } catch (error) {
+      console.error('Password change error:', error);
       throw new Error(
-        error.response?.data?.message || 'Profile update failed'
+        error.response?.data?.error || 'Password change failed'
       );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -373,6 +435,7 @@ export const AuthProvider = ({ children }) => {
     register,
     logout,
     updateProfile,
+    changePassword, // ADDED
     
     // Utilities
     getAuthHeaders,

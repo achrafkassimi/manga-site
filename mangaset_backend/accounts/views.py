@@ -1,219 +1,3 @@
-# # accounts/views.py - CLEANED UP VERSION
-# from rest_framework import generics, status, permissions
-# from rest_framework.decorators import api_view, permission_classes
-# from rest_framework.response import Response
-# from rest_framework_simplejwt.tokens import RefreshToken
-# from rest_framework_simplejwt.views import TokenObtainPairView
-# from django.contrib.auth import authenticate
-# from django.contrib.auth.models import User
-# from .serializers import (
-#     UserRegistrationSerializer, 
-#     UserSerializer,
-#     UserProfileSerializer,
-#     CustomTokenObtainPairSerializer,
-#     ChangePasswordSerializer
-# )
-
-# # JWT Token View with user data
-# class CustomTokenObtainPairView(TokenObtainPairView):
-#     serializer_class = CustomTokenObtainPairSerializer
-
-# # User Registration View
-# @api_view(['POST'])
-# @permission_classes([permissions.AllowAny])
-# def register_view(request):
-#     """Register a new user account"""
-#     serializer = UserRegistrationSerializer(data=request.data)
-#     if serializer.is_valid():
-#         user = serializer.save()
-#         refresh = RefreshToken.for_user(user)
-        
-#         return Response({
-#             'message': 'Registration successful',
-#             'user': UserSerializer(user).data,
-#             'tokens': {
-#                 'access': str(refresh.access_token),
-#                 'refresh': str(refresh),
-#             }
-#         }, status=status.HTTP_201_CREATED)
-    
-#     return Response({
-#         'error': 'Registration failed',
-#         'details': serializer.errors
-#     }, status=status.HTTP_400_BAD_REQUEST)
-
-# # Login View
-# @api_view(['POST'])
-# @permission_classes([permissions.AllowAny])  
-# def login_view(request):
-#     """Login user with username/email and password"""
-#     username = request.data.get('username')
-#     password = request.data.get('password')
-    
-#     if not username or not password:
-#         return Response({
-#             'error': 'Username and password are required'
-#         }, status=status.HTTP_400_BAD_REQUEST)
-    
-#     # Try to authenticate with username first
-#     user = authenticate(username=username, password=password)
-    
-#     # If username auth failed, try email auth
-#     if not user:
-#         try:
-#             user_by_email = User.objects.get(email=username)
-#             user = authenticate(username=user_by_email.username, password=password)
-#         except User.DoesNotExist:
-#             pass
-    
-#     if user and user.is_active:
-#         refresh = RefreshToken.for_user(user)
-#         return Response({
-#             'message': 'Login successful',
-#             'user': UserSerializer(user).data,
-#             'tokens': {
-#                 'access': str(refresh.access_token),
-#                 'refresh': str(refresh),
-#             }
-#         })
-    
-#     return Response({
-#         'error': 'Invalid credentials'
-#     }, status=status.HTTP_401_UNAUTHORIZED)
-
-# # Logout View
-# @api_view(['POST'])
-# @permission_classes([permissions.IsAuthenticated])
-# def logout_view(request):
-#     """Logout user by blacklisting refresh token - FIXED VERSION"""
-#     try:
-#         # Try to get refresh token from request data
-#         refresh_token = request.data.get('refresh')
-        
-#         # If no refresh token in body, that's okay for logout
-#         if refresh_token:
-#             try:
-#                 token = RefreshToken(refresh_token)
-#                 token.blacklist()
-#                 return Response({
-#                     'message': 'Logout successful - token blacklisted'
-#                 }, status=status.HTTP_200_OK)
-#             except Exception as token_error:
-#                 # Even if token blacklisting fails, we can still "logout"
-#                 return Response({
-#                     'message': 'Logout successful'
-#                 }, status=status.HTTP_200_OK)
-#         else:
-#             # No refresh token provided, but user is authenticated so logout is OK
-#             return Response({
-#                 'message': 'Logout successful'
-#             }, status=status.HTTP_200_OK)
-            
-#     except Exception as e:
-#         # Even if there's an error, we'll consider logout successful
-#         # since the frontend will clear tokens anyway
-#         return Response({
-#             'message': 'Logout successful'
-#         }, status=status.HTTP_200_OK)
-
-# # Alternative: Make logout more permissive
-# @api_view(['POST'])
-# @permission_classes([permissions.AllowAny])  # Changed to AllowAny
-# def logout_view_permissive(request):
-#     """Permissive logout that always succeeds"""
-#     try:
-#         refresh_token = request.data.get('refresh')
-#         if refresh_token:
-#             token = RefreshToken(refresh_token)
-#             token.blacklist()
-#     except:
-#         pass  # Ignore errors
-    
-#     return Response({
-#         'message': 'Logout successful'
-#     }, status=status.HTTP_200_OK)
-
-# # User Profile View
-# class UserProfileView(generics.RetrieveUpdateAPIView):
-#     """Get and update user profile"""
-#     serializer_class = UserProfileSerializer
-#     permission_classes = [permissions.IsAuthenticated]
-    
-#     def get_object(self):
-#         return self.request.user
-
-# # Change Password View
-# @api_view(['POST'])
-# @permission_classes([permissions.IsAuthenticated])
-# def change_password_view(request):
-#     """Change user password"""
-#     serializer = ChangePasswordSerializer(data=request.data)
-#     if serializer.is_valid():
-#         user = request.user
-        
-#         # Check old password
-#         if not user.check_password(serializer.validated_data['old_password']):
-#             return Response({
-#                 'error': 'Old password is incorrect'
-#             }, status=status.HTTP_400_BAD_REQUEST)
-        
-#         # Set new password
-#         user.set_password(serializer.validated_data['new_password'])
-#         user.save()
-        
-#         return Response({
-#             'message': 'Password changed successfully'
-#         })
-    
-#     return Response({
-#         'error': 'Password change failed',
-#         'details': serializer.errors
-#     }, status=status.HTTP_400_BAD_REQUEST)
-
-# # Password Reset Request View
-# @api_view(['POST'])
-# @permission_classes([permissions.AllowAny])
-# def password_reset_request_view(request):
-#     """Request password reset via email"""
-#     email = request.data.get('email')
-    
-#     if not email:
-#         return Response({
-#             'error': 'Email is required'
-#         }, status=status.HTTP_400_BAD_REQUEST)
-    
-#     try:
-#         user = User.objects.get(email=email)
-#         # In production, send actual email here
-#         return Response({
-#             'message': 'Password reset email sent (demo mode)'
-#         })
-#     except User.DoesNotExist:
-#         # Don't reveal if email exists or not
-#         return Response({
-#             'message': 'If this email exists, a reset link has been sent'
-#         })
-
-# # Health Check View
-# @api_view(['GET'])
-# @permission_classes([permissions.AllowAny])
-# def health_check_view(request):
-#     """Simple health check endpoint"""
-#     return Response({
-#         'status': 'healthy',
-#         'message': 'MangaSet API is running',
-#         'endpoints': {
-#             'login': '/api/v1/auth/login/',
-#             'register': '/api/v1/auth/register/',
-#             'token': '/api/v1/auth/token/',
-#             'profile': '/api/v1/auth/profile/',
-#         }
-#     })
-
-
-
-
-
 # accounts/views.py - COMPLETE USER AUTHENTICATION SYSTEM
 from rest_framework import generics, status, permissions
 from rest_framework.decorators import api_view, permission_classes
@@ -374,30 +158,84 @@ def logout_view(request):
         return Response({'message': 'Logout successful'})
 
 # User Profile Management
+# accounts/views.py - Enhanced UserProfileView with better error handling
+
+from rest_framework import generics, status, permissions
+from rest_framework.response import Response
+from django.contrib.auth.models import User
+from .serializers import UserProfileSerializer
+import logging
+
+logger = logging.getLogger(__name__)
+
 class UserProfileView(generics.RetrieveUpdateAPIView):
-    """Get and update user profile"""
+    """Get and update user profile with enhanced error handling"""
     serializer_class = UserProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
     
     def get_object(self):
         return self.request.user
     
+    def retrieve(self, request, *args, **kwargs):
+        """Override retrieve to add better error handling"""
+        try:
+            instance = self.get_object()
+            # Ensure user profile exists
+            from manga.models.user_profile import UserProfile
+            profile, created = UserProfile.objects.get_or_create(user=instance)
+            
+            serializer = self.get_serializer(instance)
+            return Response(serializer.data)
+            
+        except Exception as e:
+            logger.error(f"Profile retrieval error for user {request.user.id}: {str(e)}")
+            # Return basic user info if profile serialization fails
+            basic_data = {
+                'id': request.user.id,
+                'username': request.user.username,
+                'email': request.user.email,
+                'first_name': request.user.first_name,
+                'last_name': request.user.last_name,
+                'full_name': f"{request.user.first_name} {request.user.last_name}".strip() or request.user.username,
+                'date_joined': request.user.date_joined,
+                'last_login': request.user.last_login,
+                'bio': '',
+                'avatar_url': None,
+                'birth_date': None,
+                'preferred_language': 'en'
+            }
+            return Response(basic_data)
+    
     def update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        
-        if serializer.is_valid():
-            serializer.save()
+        """Override update with better error handling"""
+        try:
+            partial = kwargs.pop('partial', False)
+            instance = self.get_object()
+            
+            # Ensure user profile exists before update
+            from manga.models.user_profile import UserProfile
+            profile, created = UserProfile.objects.get_or_create(user=instance)
+            
+            serializer = self.get_serializer(instance, data=request.data, partial=partial)
+            
+            if serializer.is_valid():
+                serializer.save()
+                return Response({
+                    'message': 'Profile updated successfully',
+                    'user': serializer.data
+                })
+            
             return Response({
-                'message': 'Profile updated successfully',
-                'user': serializer.data
-            })
-        
-        return Response({
-            'error': 'Profile update failed',
-            'details': serializer.errors
-        }, status=status.HTTP_400_BAD_REQUEST)
+                'error': 'Profile update failed',
+                'details': serializer.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
+            
+        except Exception as e:
+            logger.error(f"Profile update error for user {request.user.id}: {str(e)}")
+            return Response({
+                'error': 'Profile update failed',
+                'message': 'An unexpected error occurred'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # Change Password
 @api_view(['POST'])
@@ -627,3 +465,53 @@ def health_check_view(request):
             'favorites': '/api/v1/auth/favorites/',
         }
     })
+
+
+# mangaset_backend/accounts/views.py - UPDATE PROFILE WITH AVATAR
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+import base64
+import uuid
+
+# Fonction utilitaire pour traiter l'avatar base64
+def process_avatar_upload(avatar_data):
+    """Process base64 avatar upload"""
+    if avatar_data and avatar_data.startswith('data:image'):
+        # Extract image data from base64
+        format, imgstr = avatar_data.split(';base64,') 
+        ext = format.split('/')[-1]
+        
+        # Generate unique filename
+        filename = f"avatars/{uuid.uuid4()}.{ext}"
+        
+        # Decode and save
+        data = ContentFile(base64.b64decode(imgstr), name=filename)
+        return data
+    return None
+
+# Modifier la vue updateProfile dans views.py
+@api_view(['PUT', 'PATCH'])
+@permission_classes([permissions.IsAuthenticated])
+def update_profile_view(request):
+    """Update user profile with avatar support"""
+    user = request.user
+    data = request.data.copy()
+    
+    # Process avatar if provided as base64
+    if 'avatar' in data and isinstance(data['avatar'], str):
+        avatar_file = process_avatar_upload(data['avatar'])
+        if avatar_file:
+            data['avatar'] = avatar_file
+    
+    serializer = UserProfileSerializer(user, data=data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response({
+            'message': 'Profil mis à jour avec succès',
+            'user': serializer.data
+        })
+    
+    return Response({
+        'error': 'Erreur de validation',
+        'details': serializer.errors
+    }, status=status.HTTP_400_BAD_REQUEST)
