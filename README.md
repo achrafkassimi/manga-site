@@ -28,7 +28,7 @@ The app is styled with **Bootstrap** and deployed on **Vercel/Netlify**.
 
 # 📚 Manga Set Web - Backend
 
-This is the **backend API** for the Manga Set Web project. It serves manga data fetched from [MangaDex API](https://api.mangadex.org/) to the frontend React application.  
+This is the **backend API** for the Manga Set Web project. It my project to the frontend React application.  
 
 ---
 
@@ -60,7 +60,6 @@ mangaController.js
 routes/
 mangaRoutes.js
 services/
-mangadexService.js
 app.js
 server.js
 package.json
