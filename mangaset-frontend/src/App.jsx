@@ -24,7 +24,7 @@ import HomePage from './pages/HomePage'
 import SearchPage from './pages/SearchPage'
 import MangaDetailsPage from './pages/MangaDetailsPage'
 import ReaderPage from './pages/ReaderPage'
-import AuthPage from './pages/AuthPage'
+// import AuthPage from './pages/AuthPage'
 
 import UserProfilePage from './components/user/UserProfilePage'
 
@@ -35,7 +35,7 @@ import LoadingPage from './pages/LoadingPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 // Error Boundary
-import ErrorBoundary from './components/common/ErrorBoundary'
+// import ErrorBoundary from './components/common/ErrorBoundary'
 
 function App() {
   return (
