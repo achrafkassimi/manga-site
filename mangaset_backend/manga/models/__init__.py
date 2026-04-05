@@ -27,7 +27,7 @@ from .analytics import CommentLike
 from .notification import Notification
 
 # Import analytics models
-from .analytics import ChapterView, BookmarkPage, RatingHelpful
+from .analytics import ChapterView, BookmarkPage, RatingHelpful, SiteVisit
 
 # Import admin/system models
 from .admin_models import SiteSettings, ActivityLog
@@ -71,7 +71,7 @@ __all__ = [
     'Comment', 'CommentLike', 'Notification',
     
     # Analytics models
-    'ChapterView', 'BookmarkPage', 'RatingHelpful',
+    'ChapterView', 'BookmarkPage', 'RatingHelpful', 'SiteVisit',
     
     # Admin models
     'SiteSettings', 'ActivityLog',

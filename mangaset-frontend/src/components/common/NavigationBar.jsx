@@ -19,6 +19,8 @@ import {
 } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
+import api from '../../services/api';
 
 const NavigationBar = () => {
   // State Management
@@ -26,7 +28,7 @@ const NavigationBar = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
+  const { darkMode, toggleTheme } = useTheme();
   const [language, setLanguage] = useState('fr');
   const [recentSearches, setRecentSearches] = useState([]);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
@@ -46,21 +48,11 @@ const NavigationBar = () => {
   // Site Configuration
   const siteName = import.meta.env.VITE_SITE_NAME || 'MangaSet';
 
-  // Initialize theme and settings
+  // Initialize settings
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
     const savedLanguage = localStorage.getItem('language') || 'fr';
     const savedSearches = JSON.parse(localStorage.getItem('recentSearches') || '[]');
-    
-    if (savedTheme) {
-      setDarkMode(savedTheme === 'dark');
-      document.documentElement.setAttribute('data-bs-theme', savedTheme);
-    } else {
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      setDarkMode(prefersDark);
-      document.documentElement.setAttribute('data-bs-theme', prefersDark ? 'dark' : 'light');
-    }
-    
+
     setLanguage(savedLanguage);
     setRecentSearches(savedSearches);
     
@@ -98,7 +90,7 @@ const NavigationBar = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Mock search function
+  // Live search against Django API
   const performSearch = async (query) => {
     if (!query.trim() || query.length < 2) {
       setSearchResults([]);
@@ -106,43 +98,15 @@ const NavigationBar = () => {
     }
 
     setSearchLoading(true);
-    
+
     try {
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      // Mock search results
-      const mockResults = [
-        {
-          id: 1,
-          title: 'One Piece',
-          author: 'Eiichiro Oda',
-          cover_image: 'https://via.placeholder.com/50x70/007bff/ffffff?text=OP',
-          status: 'ongoing',
-          rating: 9.2,
-          slug: 'one-piece'
-        },
-        {
-          id: 2,
-          title: 'Naruto',
-          author: 'Masashi Kishimoto',
-          cover_image: 'https://via.placeholder.com/50x70/28a745/ffffff?text=N',
-          status: 'completed',
-          rating: 8.9,
-          slug: 'naruto'
-        },
-        {
-          id: 3,
-          title: 'Attack on Titan',
-          author: 'Hajime Isayama',
-          cover_image: 'https://via.placeholder.com/50x70/dc3545/ffffff?text=AOT',
-          status: 'completed',
-          rating: 9.0,
-          slug: 'attack-on-titan'
-        }
-      ].filter(manga => manga.title.toLowerCase().includes(query.toLowerCase()));
-      
-      setSearchResults(mockResults);
+      const response = await api.get('/search/', { params: { q: query } });
+      const data = response.data;
+      const results = (data.results || data || []).slice(0, 6).map((m) => ({
+        ...m,
+        rating: m.average_rating ?? m.rating ?? 0,
+      }));
+      setSearchResults(results);
     } catch (error) {
       console.error('Search failed:', error);
       setSearchResults([]);
@@ -205,15 +169,6 @@ const NavigationBar = () => {
   const clearRecentSearches = () => {
     setRecentSearches([]);
     localStorage.removeItem('recentSearches');
-  };
-
-  // Toggle theme
-  const toggleTheme = () => {
-    const newTheme = !darkMode;
-    setDarkMode(newTheme);
-    const theme = newTheme ? 'dark' : 'light';
-    localStorage.setItem('theme', theme);
-    document.documentElement.setAttribute('data-bs-theme', theme);
   };
 
   // Toggle language

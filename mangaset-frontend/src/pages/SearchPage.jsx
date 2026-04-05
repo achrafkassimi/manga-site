@@ -59,9 +59,24 @@ const SearchPage = () => {
     // Parse URL parameters
     const params = new URLSearchParams(location.search);
     const newFilters = { ...filters };
-    
+
+    // Derive default ordering/status from the current route
+    const pathDefaults = {
+      '/popular':   { ordering: '-view_count' },
+      '/latest':    { ordering: '-updated_at' },
+      '/new':       { ordering: '-created_at' },
+      '/completed': { status: 'completed', ordering: '-updated_at' },
+      '/ongoing':   { status: 'ongoing',   ordering: '-updated_at' },
+      '/browse':    { ordering: '-updated_at' },
+    };
+    const routeDefaults = pathDefaults[location.pathname] || {};
+    Object.assign(newFilters, routeDefaults);
+
     params.forEach((value, key) => {
       if (key === 'genres') {
+        newFilters.genres = value.split(',').filter(Boolean);
+      } else if (key === 'genre') {
+        // GenreCloud links use singular ?genre=action — convert to array
         newFilters.genres = value.split(',').filter(Boolean);
       } else if (key === 'page') {
         setCurrentPage(parseInt(value) || 1);
@@ -69,14 +84,12 @@ const SearchPage = () => {
         newFilters[key] = value;
       }
     });
-    
+
     setFilters(newFilters);
-    
-    // Auto-search if there are parameters
-    if (params.toString()) {
-      performSearch(newFilters, parseInt(params.get('page')) || 1);
-    }
-  }, [location.search]);
+    // Always search — if no URL params, show all manga with defaults
+    performSearch(newFilters, parseInt(params.get('page')) || 1);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.search, location.pathname]);
 
   const fetchGenres = async () => {
     try {
@@ -90,30 +103,52 @@ const SearchPage = () => {
   const performSearch = async (searchFilters = filters, page = 1) => {
     setLoading(true);
     try {
-      const params = {
-        page,
-        per_page: itemsPerPage,
-        ...searchFilters,
-        genres: searchFilters.genres.join(',')
-      };
+      // Build backend params
+      // /manga/ supports: status, genres__name, ordering, search, page
+      // /search/ only works with a non-empty `q` and returns none otherwise
+      const params = { page, page_size: itemsPerPage };
 
-      // Remove empty parameters
+      if (searchFilters.ordering) params.ordering = searchFilters.ordering;
+      if (searchFilters.status)   params.status = searchFilters.status;
+
+      // Map genre array → `genres__name` (supports multiple values via comma)
+      if (searchFilters.genres && searchFilters.genres.length > 0) {
+        // DRF DjangoFilterBackend accepts repeated param or comma-separated
+        params['genres__name'] = searchFilters.genres.join(',');
+      }
+
+      // Remove empty params
       Object.keys(params).forEach(key => {
-        if (!params[key] || (Array.isArray(params[key]) && params[key].length === 0)) {
+        if (params[key] === '' || params[key] === null || params[key] === undefined) {
           delete params[key];
         }
       });
 
-      const response = await mangaService.searchManga(params.q || '', params);
+      let response;
+      if (searchFilters.q && searchFilters.q.trim().length >= 2) {
+        // Has text query → use search endpoint (searches title/author/description/genres)
+        response = await api.get('/search/', { params: { ...params, q: searchFilters.q } });
+      } else {
+        // Browse / filter mode → use /manga/ which supports filters + ordering
+        if (searchFilters.q && searchFilters.q.trim()) {
+          params.search = searchFilters.q.trim(); // DRF SearchFilter param
+        }
+        response = await api.get('/manga/', { params });
+      }
+
       const data = response.data;
-      
-      setSearchResults(data.results || data || []);
-      setTotalResults(data.count || data.length || 0);
-      setTotalPages(Math.ceil((data.count || data.length || 0) / itemsPerPage));
-      
+      const results = (data.results || (Array.isArray(data) ? data : [])).map(m => ({
+        ...m,
+        rating: m.average_rating ?? m.rating ?? 0,
+      }));
+
+      setSearchResults(results);
+      setTotalResults(data.count ?? results.length);
+      setTotalPages(Math.ceil((data.count ?? results.length) / itemsPerPage));
+
       // Update URL
-      updateURL(params, page);
-      
+      updateURL({ ...searchFilters, genres: searchFilters.genres.join(',') }, page);
+
     } catch (error) {
       console.error('Search error:', error);
       setSearchResults([]);
@@ -346,7 +381,7 @@ const SearchPage = () => {
                     >
                       <option value="-updated_at">Dernière MAJ</option>
                       <option value="-created_at">Plus récent</option>
-                      <option value="-rating">Mieux noté</option>
+                      <option value="-average_rating">Mieux noté</option>
                       <option value="-view_count">Plus populaire</option>
                       <option value="title">Titre A-Z</option>
                       <option value="-title">Titre Z-A</option>

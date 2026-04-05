@@ -7,6 +7,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 // Context Providers
 import { AuthProvider } from './context/AuthContext'
+import { ThemeProvider } from './context/ThemeContext'
 
 // Layout Components
 import NavigationBar from './components/common/NavigationBar'
@@ -34,12 +35,14 @@ import NotFoundPage from './pages/NotFoundPage'
 import LoadingPage from './pages/LoadingPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
+import MonitoringDashboard from './pages/MonitoringDashboard';
 // Error Boundary
 // import ErrorBoundary from './components/common/ErrorBoundary'
 
 function App() {
   return (
     <Router>
+      <ThemeProvider>
       <AuthProvider>
         {/* <ErrorBoundary> */}
           <div className="App d-flex flex-column min-vh-100">
@@ -120,6 +123,13 @@ function App() {
                 
                 {/* ===== UTILITY ROUTES ===== */}
                 
+                {/* Admin / Monitoring */}
+                <Route path="/monitoring" element={
+                  <ProtectedRoute>
+                    <MonitoringDashboard />
+                  </ProtectedRoute>
+                } />
+
                 {/* Testing & Development */}
                 <Route path="/test" element={<TestPage />} />
                 <Route path="/loading" element={<LoadingPage />} />
@@ -159,6 +169,7 @@ function App() {
           </div>
         {/* </ErrorBoundary> */}
       </AuthProvider>
+      </ThemeProvider>
     </Router>
   )
 }

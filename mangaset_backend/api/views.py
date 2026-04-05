@@ -547,14 +547,22 @@ logger = logging.getLogger(__name__)
 
 # Manga Views
 class MangaListView(generics.ListAPIView):
-    queryset = Manga.objects.all()
     serializer_class = MangaListSerializer
     permission_classes = [AllowAny]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['status', 'genres__name']
+    filterset_fields = ['status']
     search_fields = ['title', 'author', 'description']
-    ordering_fields = ['created_at', 'updated_at', 'average_rating', 'view_count']
+    ordering_fields = ['created_at', 'updated_at', 'average_rating', 'view_count', 'title']
     ordering = ['-updated_at']
+
+    def get_queryset(self):
+        qs = Manga.objects.prefetch_related('genres').all()
+        # Support comma-separated genres: ?genres__name=action,romance
+        genres_param = self.request.query_params.get('genres__name', '')
+        if genres_param:
+            genre_list = [g.strip() for g in genres_param.split(',') if g.strip()]
+            qs = qs.filter(genres__name__in=genre_list).distinct()
+        return qs
 
 class MangaDetailView(generics.RetrieveAPIView):
     queryset = Manga.objects.prefetch_related('genres', 'chapters')
@@ -712,18 +720,18 @@ def update_reading_progress(request):
 class MangaSearchView(generics.ListAPIView):
     serializer_class = MangaListSerializer
     permission_classes = [AllowAny]
-    
+
     def get_queryset(self):
         query = self.request.query_params.get('q', '').strip()
         if not query:
-            return Manga.objects.none()
-        
+            return Manga.objects.prefetch_related('genres').order_by('-view_count')
+
         return Manga.objects.filter(
             Q(title__icontains=query) |
             Q(author__icontains=query) |
             Q(description__icontains=query) |
             Q(genres__name__icontains=query)
-        ).distinct().order_by('-view_count')
+        ).distinct().prefetch_related('genres').order_by('-view_count')
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

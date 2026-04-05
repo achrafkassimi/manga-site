@@ -1,5 +1,5 @@
 from django.urls import path
-from api import admin_views
+from api import admin_views, analytics_views
 from . import views
 
 
@@ -36,4 +36,11 @@ urlpatterns = [
     path('admin/manga/<slug:slug>/', admin_views.AdminMangaDetailView.as_view(), name='admin-manga-detail'),
     path('admin/manga/bulk-actions/', admin_views.bulk_manga_actions, name='admin-bulk-actions'),
     path('admin/users/', admin_views.AdminUserListView.as_view(), name='admin-users'),
+
+    # Analytics endpoints (admin only)
+    path('analytics/dashboard/', analytics_views.analytics_dashboard, name='analytics-dashboard'),
+    path('analytics/visits/', analytics_views.analytics_visits, name='analytics-visits'),
+    path('analytics/activity/', analytics_views.analytics_activity_log, name='analytics-activity'),
+    path('analytics/top-content/', analytics_views.analytics_top_content, name='analytics-top-content'),
+    path('analytics/users/', analytics_views.analytics_user_stats, name='analytics-users'),
 ]

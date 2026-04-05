@@ -147,6 +147,47 @@ class CommentLike(TimeStampedModel):
         return f"{self.user.username} {self.vote_type}d comment by {self.comment.user.username}"
 
 
+class SiteVisit(models.Model):
+    """Track general page visits for site-wide analytics"""
+
+    # Who visited
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='site_visits')
+    ip_address = models.GenericIPAddressField()
+    session_id = models.CharField(max_length=100, blank=True)
+
+    # What they visited
+    path = models.CharField(max_length=500)
+    referrer = models.URLField(max_length=500, blank=True)
+    query_string = models.CharField(max_length=500, blank=True)
+
+    # Device info
+    user_agent = models.TextField(max_length=500, blank=True)
+    device_type = models.CharField(max_length=20, choices=DeviceType.CHOICES, default=DeviceType.DESKTOP)
+
+    # Geographic info (populated async via IP lookup)
+    country_code = models.CharField(max_length=2, blank=True)
+    country_name = models.CharField(max_length=100, blank=True)
+    city = models.CharField(max_length=100, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['-created_at']),
+            models.Index(fields=['ip_address', '-created_at']),
+            models.Index(fields=['country_code', '-created_at']),
+            models.Index(fields=['device_type', '-created_at']),
+            models.Index(fields=['path', '-created_at']),
+        ]
+        verbose_name = 'Site Visit'
+        verbose_name_plural = 'Site Visits'
+
+    def __str__(self):
+        user_info = self.user.username if self.user else f'Anonymous ({self.ip_address})'
+        return f'{user_info} visited {self.path} at {self.created_at}'
+
+
 class RatingHelpful(TimeStampedModel):
     """Track helpful votes on manga ratings"""
     
