@@ -42,8 +42,9 @@ urlpatterns = [
     path('api/', api_root, name='api_root'),
     
     # FIXED: API v1 endpoints - match frontend expectations
-    path('api/v1/auth/', include('accounts.urls')),   # ✅ Changed from /api/auth/
-    path('api/v1/', include('api.urls')),             # ✅ Keep existing API endpoints
+    path('api/v1/auth/', include('accounts.urls')),
+    path('api/v1/', include('api.urls')),
+    path('api/v1/monitoring/', include('monitoring.urls')),  # Admin-only monitoring
 ]
 
 # Serve media files in development

@@ -14,6 +14,7 @@ import NavigationBar from './components/common/NavigationBar'
 import Footer from './components/common/Footer'
 import ScrollToTop from './components/common/ScrollToTop'
 import ProtectedRoute from './components/common/ProtectedRoute'
+import AdminRoute from './components/common/AdminRoute'
 
 import UserDashboard from './components/user/UserProfilePage'
 import LoginForm from './components/user/LoginForm'
@@ -123,11 +124,11 @@ function App() {
                 
                 {/* ===== UTILITY ROUTES ===== */}
                 
-                {/* Admin / Monitoring */}
+                {/* Admin / Monitoring — staff only */}
                 <Route path="/monitoring" element={
-                  <ProtectedRoute>
+                  <AdminRoute>
                     <MonitoringDashboard />
-                  </ProtectedRoute>
+                  </AdminRoute>
                 } />
 
                 {/* Testing & Development */}

@@ -164,6 +164,13 @@ manga-site/
 - Toggle stored in localStorage
 - Respect `prefers-color-scheme` on first visit
 
+#### 11. Multi-language Support (i18n)
+- Install `react-i18next` for frontend translations
+- Language files: `locales/fr.json`, `locales/en.json`, `locales/ar.json` (RTL support)
+- Language toggle already wired in NavigationBar — just needs the translation keys
+- Backend: serve manga title/description in multiple languages via separate model fields or django-modeltranslation
+- Auto-detect browser language on first visit, save preference to localStorage
+
 ### Low Priority / Future
 
 #### 11. Reading Lists / Collections

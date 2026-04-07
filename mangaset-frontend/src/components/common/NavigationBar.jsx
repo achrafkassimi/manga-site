@@ -560,12 +560,12 @@ const NavigationBar = () => {
                     <i className="fas fa-cog me-2 text-secondary"></i>
                     Paramètres
                   </NavDropdown.Item>
-                  {user?.is_admin && (
+                  {(user?.is_staff || user?.is_superuser) && (
                     <>
                       <NavDropdown.Divider />
-                      <NavDropdown.Item as={Link} to="/admin" className="text-warning">
-                        <i className="fas fa-shield-alt me-2"></i>
-                        Administration
+                      <NavDropdown.Item as={Link} to="/monitoring" className="text-warning">
+                        <i className="fas fa-chart-line me-2"></i>
+                        Monitoring
                       </NavDropdown.Item>
                     </>
                   )}
@@ -984,16 +984,16 @@ const NavigationBar = () => {
                       <span>Paramètres</span>
                     </ListGroup.Item>
 
-                    {user?.is_admin && (
-                      <ListGroup.Item 
-                        as={Link} 
-                        to="/admin" 
+                    {(user?.is_staff || user?.is_superuser) && (
+                      <ListGroup.Item
+                        as={Link}
+                        to="/monitoring"
                         action
                         className={`d-flex align-items-center py-3 ${darkMode ? 'bg-dark text-light' : ''}`}
                         onClick={() => setShowMobileMenu(false)}
                       >
-                        <i className="fas fa-shield-alt me-3 text-warning fa-lg"></i>
-                        <span>Administration</span>
+                        <i className="fas fa-chart-line me-3 text-warning fa-lg"></i>
+                        <span>Monitoring</span>
                       </ListGroup.Item>
                     )}
                   </ListGroup>

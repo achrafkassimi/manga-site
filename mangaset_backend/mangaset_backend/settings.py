@@ -48,8 +48,9 @@ INSTALLED_APPS = [
     
     # Local apps
     'manga',
-    'accounts',  # Make sure this is here
+    'accounts',
     'api',
+    'monitoring',
 ]
 
 MIDDLEWARE = [

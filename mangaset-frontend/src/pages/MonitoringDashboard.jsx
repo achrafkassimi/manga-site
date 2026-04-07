@@ -118,11 +118,11 @@ export default function MonitoringDashboard() {
     setError('');
     try {
       const [dashRes, visitsRes, actRes, topRes, usrRes] = await Promise.all([
-        api.get('/analytics/dashboard/'),
-        api.get('/analytics/visits/?days=7'),
-        api.get('/analytics/activity/?days=7'),
-        api.get('/analytics/top-content/'),
-        api.get('/analytics/users/'),
+        api.get('/monitoring/dashboard/'),
+        api.get('/monitoring/visits/?days=7'),
+        api.get('/monitoring/activity/?days=7'),
+        api.get('/monitoring/top-content/'),
+        api.get('/monitoring/users/'),
       ]);
       setData(dashRes.data);
       setVisits(visitsRes.data.results ?? []);
@@ -145,7 +145,7 @@ export default function MonitoringDashboard() {
   const loadActivity = useCallback(async () => {
     try {
       const res = await api.get(
-        `/analytics/activity/?days=7${severityFilter ? `&severity=${severityFilter}` : ''}`
+        `/monitoring/activity/?days=7${severityFilter ? `&severity=${severityFilter}` : ''}`
       );
       setActivity(res.data.results ?? []);
     } catch (_) {}

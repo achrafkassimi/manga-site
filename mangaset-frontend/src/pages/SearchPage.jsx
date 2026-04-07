@@ -237,7 +237,7 @@ const SearchPage = () => {
   return (
     <div className="search-page">
       {/* Search Header */}
-      <div className="bg-light py-4 mb-4">
+      <div className="bg-body-secondary py-4 mb-4">
         <Container>
           <Row className="align-items-center">
             <Col>
@@ -499,7 +499,7 @@ const SearchPage = () => {
                       <i className="fas fa-tags me-1"></i>
                       Genres ({filters.genres.length} sélectionnés)
                     </Form.Label>
-                    <div className="genre-filter border rounded p-2" style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                    <div className="genre-filter border rounded p-2 bg-body" style={{ maxHeight: '200px', overflowY: 'auto' }}>
                       {genres.map(genre => (
                         <Form.Check
                           key={genre.id}

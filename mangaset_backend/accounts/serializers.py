@@ -33,11 +33,11 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            'id', 'username', 'email', 'first_name', 'last_name', 
+            'id', 'username', 'email', 'first_name', 'last_name',
             'full_name', 'bio', 'avatar', 'avatar_url', 'birth_date', 'preferred_language',
-            'date_joined', 'last_login'
+            'date_joined', 'last_login', 'is_staff', 'is_superuser',
         ]
-        read_only_fields = ['id', 'username', 'date_joined', 'last_login']
+        read_only_fields = ['id', 'username', 'date_joined', 'last_login', 'is_staff', 'is_superuser']
     
     def get_full_name(self, obj):
         return f"{obj.first_name} {obj.last_name}".strip() or obj.username

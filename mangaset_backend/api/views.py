@@ -561,7 +561,11 @@ class MangaListView(generics.ListAPIView):
         genres_param = self.request.query_params.get('genres__name', '')
         if genres_param:
             genre_list = [g.strip() for g in genres_param.split(',') if g.strip()]
-            qs = qs.filter(genres__name__in=genre_list).distinct()
+            # Case-insensitive match (DB may store "Action" but URL sends "action")
+            q = Q()
+            for g in genre_list:
+                q |= Q(genres__name__iexact=g)
+            qs = qs.filter(q).distinct()
         return qs
 
 class MangaDetailView(generics.RetrieveAPIView):

@@ -73,9 +73,9 @@ class CommentAdmin(admin.ModelAdmin):
 
 @admin.register(Notification)
 class NotificationAdmin(admin.ModelAdmin):
-    list_display = ('user', 'notification_type', 'is_read', 'created_at')
-    list_filter = ('notification_type', 'is_read')
-    search_fields = ('user__username',)
+    list_display = ('user', 'type', 'title', 'is_read', 'priority', 'created_at')
+    list_filter = ('type', 'is_read', 'priority')
+    search_fields = ('user__username', 'title', 'message')
 
 
 @admin.register(SiteVisit)
