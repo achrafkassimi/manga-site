@@ -37,15 +37,16 @@ import LoadingPage from './pages/LoadingPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import MonitoringDashboard from './pages/MonitoringDashboard';
+import AdminDashboardPage from './pages/AdminDashboardPage';
 // Error Boundary
-// import ErrorBoundary from './components/common/ErrorBoundary'
+import ErrorBoundary from './components/common/ErrorBoundary'
 
 function App() {
   return (
     <Router>
       <ThemeProvider>
       <AuthProvider>
-        {/* <ErrorBoundary> */}
+        <ErrorBoundary>
           <div className="App d-flex flex-column min-vh-100">
             <ScrollToTop />
             <NavigationBar />
@@ -122,8 +123,16 @@ function App() {
                   </ProtectedRoute>
                 } />
                 
+                {/* ===== ADMIN ROUTES (is_staff only) ===== */}
+
+                <Route path="/admin/dashboard" element={
+                  <AdminRoute>
+                    <AdminDashboardPage />
+                  </AdminRoute>
+                } />
+
                 {/* ===== UTILITY ROUTES ===== */}
-                
+
                 {/* Admin / Monitoring — staff only */}
                 <Route path="/monitoring" element={
                   <AdminRoute>
@@ -168,7 +177,7 @@ function App() {
               toastClassName="custom-toast"
             />
           </div>
-        {/* </ErrorBoundary> */}
+        </ErrorBoundary>
       </AuthProvider>
       </ThemeProvider>
     </Router>
@@ -383,38 +392,3 @@ export default App
 
 
 
-
-
-// import React from 'react';
-// import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-// // import { AuthProvider } from './contexts/AuthContext';
-// import { AuthProvider } from './context/AuthContext';
-// import HomePage from './pages/HomePage';
-// import MangaDetailsPage from './pages/MangaDetailsPage';
-// import ReaderPage from './pages/ReaderPage';
-// import SearchPage from './pages/SearchPage';
-// import LoginPage from './pages/LoginPage';
-// import RegisterPage from './pages/RegisterPage';
-// import ProfilePage from './pages/ProfilePage';
-
-// function App() {
-//     return (
-//         <AuthProvider>
-//             <Router>
-//                 <div className="App">
-//                     <Routes>
-//                         <Route path="/" element={<HomePage />} />
-//                         <Route path="/manga/:slug" element={<MangaDetailsPage />} />
-//                         <Route path="/read/:mangaSlug/:chapterNumber" element={<ReaderPage />} />
-//                         <Route path="/search" element={<SearchPage />} />
-//                         <Route path="/login" element={<LoginPage />} />
-//                         <Route path="/register" element={<RegisterPage />} />
-//                         <Route path="/profile" element={<ProfilePage />} />
-//                     </Routes>
-//                 </div>
-//             </Router>
-//         </AuthProvider>
-//     );
-// }
-
-// export default App;

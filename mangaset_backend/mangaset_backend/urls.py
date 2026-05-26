@@ -20,6 +20,11 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.http import JsonResponse
+from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularSwaggerView,
+    SpectacularRedocView,
+)
 
 def api_root(request):
     """API root endpoint"""
@@ -37,11 +42,16 @@ def api_root(request):
 urlpatterns = [
     # Admin panel
     path('admin/', admin.site.urls),
-    
+
     # API root
     path('api/', api_root, name='api_root'),
-    
-    # FIXED: API v1 endpoints - match frontend expectations
+
+    # OpenAPI schema + interactive docs
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+
+    # API v1 endpoints - match frontend expectations
     path('api/v1/auth/', include('accounts.urls')),
     path('api/v1/', include('api.urls')),
     path('api/v1/monitoring/', include('monitoring.urls')),  # Admin-only monitoring

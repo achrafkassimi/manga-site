@@ -2,6 +2,8 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from manga.models import Manga, Chapter, Genre, UserFavorite, ReadingHistory
+from manga.models.comment import Comment
+from manga.models.notification import Notification
 
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
@@ -75,7 +77,85 @@ class UserFavoriteSerializer(serializers.ModelSerializer):
 class ReadingHistorySerializer(serializers.ModelSerializer):
     manga = MangaListSerializer(read_only=True)
     chapter_info = ChapterListSerializer(source='chapter', read_only=True)
-    
+
     class Meta:
         model = ReadingHistory
         fields = '__all__'
+
+
+class CommentAuthorSerializer(serializers.ModelSerializer):
+    """Minimal user info embedded in comments."""
+    avatar_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'avatar_url']
+
+    def get_avatar_url(self, obj):
+        try:
+            if hasattr(obj, 'profile') and obj.profile and obj.profile.avatar:
+                request = self.context.get('request')
+                if request:
+                    return request.build_absolute_uri(obj.profile.avatar.url)
+                return obj.profile.avatar.url
+        except Exception:
+            pass
+        return None
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    user = CommentAuthorSerializer(read_only=True)
+    replies = serializers.SerializerMethodField()
+    can_edit = serializers.SerializerMethodField()
+    can_delete = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Comment
+        fields = [
+            'id', 'user', 'content', 'parent', 'is_spoiler', 'is_edited',
+            'is_pinned', 'likes_count', 'dislikes_count', 'reply_count',
+            'replies', 'can_edit', 'can_delete',
+            'created_at', 'edited_at',
+        ]
+        read_only_fields = [
+            'id', 'user', 'is_edited', 'is_pinned',
+            'likes_count', 'dislikes_count', 'reply_count',
+            'replies', 'can_edit', 'can_delete',
+            'created_at', 'edited_at',
+        ]
+
+    def get_replies(self, obj):
+        # Only return immediate replies — UI can paginate deeper if needed.
+        if obj.parent_id is not None:
+            return []
+        replies_qs = obj.replies.filter(is_approved=True).order_by('created_at')[:20]
+        return CommentSerializer(replies_qs, many=True, context=self.context).data
+
+    def get_can_edit(self, obj):
+        request = self.context.get('request')
+        return bool(request and obj.can_be_edited_by(request.user))
+
+    def get_can_delete(self, obj):
+        request = self.context.get('request')
+        return bool(request and obj.can_be_deleted_by(request.user))
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+    icon = serializers.SerializerMethodField()
+    color_class = serializers.SerializerMethodField()
+    target_title = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = Notification
+        fields = [
+            'id', 'type', 'title', 'message', 'action_url',
+            'is_read', 'priority', 'icon', 'color_class', 'target_title',
+            'read_at', 'created_at',
+        ]
+        read_only_fields = fields
+
+    def get_icon(self, obj):
+        return obj.get_icon()
+
+    def get_color_class(self, obj):
+        return obj.get_color_class()

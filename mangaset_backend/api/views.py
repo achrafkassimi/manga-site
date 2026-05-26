@@ -535,12 +535,14 @@ import logging
 
 # Import models from manga app
 from manga.models import Manga, Chapter, Genre, UserFavorite, ReadingHistory
+from manga.models.comment import Comment
+from manga.models.notification import Notification
 
 # Import serializers from current app
 from .serializers import (
     MangaListSerializer, MangaDetailSerializer, ChapterListSerializer,
     ChapterDetailSerializer, GenreSerializer, UserFavoriteSerializer,
-    ReadingHistorySerializer
+    ReadingHistorySerializer, CommentSerializer, NotificationSerializer,
 )
 
 logger = logging.getLogger(__name__)
@@ -755,3 +757,130 @@ def user_reading_stats(request):
         )
     }
     return Response(stats)
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Comments
+# ──────────────────────────────────────────────────────────────────────────────
+
+class MangaCommentsListCreateView(generics.ListCreateAPIView):
+    """List approved top-level comments for a manga and create new ones."""
+    serializer_class = CommentSerializer
+
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            return [IsAuthenticated()]
+        return [AllowAny()]
+
+    def get_queryset(self):
+        manga_slug = self.kwargs['manga_slug']
+        return (
+            Comment.objects
+            .filter(manga__slug=manga_slug, is_approved=True, parent__isnull=True)
+            .select_related('user', 'manga')
+            .prefetch_related('replies')
+            .order_by('-is_pinned', '-created_at')
+        )
+
+    def perform_create(self, serializer):
+        manga = get_object_or_404(Manga, slug=self.kwargs['manga_slug'])
+        parent = serializer.validated_data.get('parent')
+        if parent and parent.manga_id != manga.id:
+            raise serializers_exception_invalid_parent()
+        serializer.save(user=self.request.user, manga=manga)
+
+
+def serializers_exception_invalid_parent():
+    from rest_framework.exceptions import ValidationError
+    return ValidationError({'parent': 'Parent comment does not belong to this manga.'})
+
+
+class CommentDetailView(generics.RetrieveDestroyAPIView):
+    """Retrieve or delete a single comment. Only the author or staff can delete."""
+    serializer_class = CommentSerializer
+    queryset = Comment.objects.filter(is_approved=True)
+    permission_classes = [IsAuthenticated]
+
+    def perform_destroy(self, instance):
+        if not instance.can_be_deleted_by(self.request.user):
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied('You cannot delete this comment.')
+        instance.delete()
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def comment_like(request, pk):
+    comment = get_object_or_404(Comment, pk=pk, is_approved=True)
+    comment.like(request.user)
+    comment.refresh_from_db()
+    return Response({
+        'likes_count': comment.likes_count,
+        'dislikes_count': comment.dislikes_count,
+    })
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def comment_dislike(request, pk):
+    comment = get_object_or_404(Comment, pk=pk, is_approved=True)
+    comment.dislike(request.user)
+    comment.refresh_from_db()
+    return Response({
+        'likes_count': comment.likes_count,
+        'dislikes_count': comment.dislikes_count,
+    })
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Notifications
+# ──────────────────────────────────────────────────────────────────────────────
+
+class UserNotificationsView(generics.ListAPIView):
+    """List the current user's notifications, newest first."""
+    serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return (
+            Notification.objects
+            .filter(user=self.request.user)
+            .order_by('-created_at')
+        )
+
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        unread_count = Notification.objects.filter(user=request.user, is_read=False).count()
+        if isinstance(response.data, dict):
+            response.data['unread_count'] = unread_count
+        else:
+            response.data = {'results': response.data, 'unread_count': unread_count}
+        return response
+
+
+class NotificationDetailView(generics.UpdateAPIView):
+    """Mark a single notification as read/unread."""
+    serializer_class = NotificationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Notification.objects.filter(user=self.request.user)
+
+    def patch(self, request, *args, **kwargs):
+        notification = self.get_object()
+        is_read = request.data.get('is_read', True)
+        if is_read:
+            notification.mark_as_read()
+        else:
+            notification.mark_as_unread()
+        return Response(self.get_serializer(notification).data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def mark_all_notifications_read(request):
+    updated = Notification.objects.filter(user=request.user, is_read=False).update(
+        is_read=True,
+        read_at=timezone.now(),
+    )
+    return Response({'marked_read': updated})

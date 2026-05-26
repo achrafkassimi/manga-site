@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import { mangaService } from '../services/mangaService';
 import { useAuth } from '../context/AuthContext';
 import LoadingSpinner from '../components/common/LoadingSpinner';
+import CommentSection from '../components/manga/CommentSection';
 
 const MangaDetailsPage = () => {
   const { slug } = useParams();
@@ -365,6 +366,13 @@ const MangaDetailsPage = () => {
                   <i className="fas fa-magic me-1"></i>
                   Voir les recommandations
                 </Button>
+              </Card.Body>
+            </Card>
+
+            {/* Comments */}
+            <Card className="mt-4">
+              <Card.Body>
+                <CommentSection mangaSlug={slug} />
               </Card.Body>
             </Card>
           </Col>

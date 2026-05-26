@@ -1,0 +1,12 @@
+# Development & test extras for the MangaSet backend.
+# Install with:  pip install -r requirements-dev.txt
+#
+# (Runtime deps such as django, djangorestframework, djangorestframework-simplejwt,
+#  django-cors-headers, django-filter, python-decouple are assumed installed already.)
+
+# OpenAPI schema + Swagger UI / ReDoc
+drf-spectacular>=0.27,<1.0
+
+# Test runner (Django integration + factories)
+pytest>=8.0
+pytest-django>=4.8

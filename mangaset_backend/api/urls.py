@@ -30,8 +30,14 @@ urlpatterns = [
     # Search
     path('search/', views.MangaSearchView.as_view(), name='manga-search'),
 
-        # Admin endpoints
-    # path('admin/dashboard/stats/', views.admin_dashboard_stats, name='admin-dashboard-stats'),
+    # Comments
+    path('manga/<slug:manga_slug>/comments/', views.MangaCommentsListCreateView.as_view(), name='manga-comments'),
+    path('comments/<int:pk>/', views.CommentDetailView.as_view(), name='comment-detail'),
+    path('comments/<int:pk>/like/', views.comment_like, name='comment-like'),
+    path('comments/<int:pk>/dislike/', views.comment_dislike, name='comment-dislike'),
+
+    # Admin endpoints
+    path('admin/dashboard/stats/', admin_views.admin_dashboard_stats, name='admin-dashboard-stats'),
     path('admin/manga/', admin_views.AdminMangaListView.as_view(), name='admin-manga-list'),
     path('admin/manga/<slug:slug>/', admin_views.AdminMangaDetailView.as_view(), name='admin-manga-detail'),
     path('admin/manga/bulk-actions/', admin_views.bulk_manga_actions, name='admin-bulk-actions'),

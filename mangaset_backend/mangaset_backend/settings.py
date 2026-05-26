@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'corsheaders',
     'django_filters',
-    
+    'drf_spectacular',
+
     # Local apps
     'manga',
     'accounts',
@@ -165,6 +166,16 @@ REST_FRAMEWORK = {
         'rest_framework.filters.SearchFilter',
         'rest_framework.filters.OrderingFilter',
     ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+# drf-spectacular (Swagger / OpenAPI docs)
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'MangaSet API',
+    'DESCRIPTION': 'REST API for the MangaSet manga reading platform.',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'COMPONENT_SPLIT_REQUEST': True,
 }
 
 # CORS settings
@@ -238,7 +249,9 @@ X_FRAME_OPTIONS = 'DENY'
 
 CACHES = {
     'default': {
-        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'mangaset-default-cache',
+        'TIMEOUT': 300,
     }
 }
 

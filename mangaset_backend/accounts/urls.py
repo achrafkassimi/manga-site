@@ -1,6 +1,7 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 from . import views
+from api import views as api_views
 
 app_name = 'accounts'
 
@@ -36,4 +37,8 @@ urlpatterns = [
     # Health check
     path('health/', views.health_check_view, name='health_check'),
 
+    # Notifications (handled by api app views)
+    path('notifications/', api_views.UserNotificationsView.as_view(), name='notifications-list'),
+    path('notifications/<int:pk>/', api_views.NotificationDetailView.as_view(), name='notifications-detail'),
+    path('notifications/mark-all-read/', api_views.mark_all_notifications_read, name='notifications-mark-all-read'),
 ]

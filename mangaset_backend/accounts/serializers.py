@@ -8,17 +8,19 @@ from manga.models.user_profile import  UserProfile
 
 
 class UserSerializer(serializers.ModelSerializer):
-    """Standard user serializer - ADDED THIS"""
+    """Standard user serializer (used by AdminUserListView + others)."""
     full_name = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = User
         fields = [
-            'id', 'username', 'email', 'first_name', 
-            'last_name', 'full_name', 'date_joined', 'is_active'
+            'id', 'username', 'email', 'first_name', 'last_name', 'full_name',
+            'date_joined', 'last_login', 'is_active', 'is_staff',
         ]
-        read_only_fields = ['id', 'date_joined', 'is_active']
-    
+        read_only_fields = [
+            'id', 'date_joined', 'last_login', 'is_active', 'is_staff',
+        ]
+
     def get_full_name(self, obj):
         return f"{obj.first_name} {obj.last_name}".strip() or obj.username
 

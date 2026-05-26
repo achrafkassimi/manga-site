@@ -1,251 +1,53 @@
-// const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+// src/services/apiService.js
+// Clean, working API service module.
+// Exposes the 5 critical methods (getMangaList, getPopularManga,
+// getFeaturedManga, getLatestUpdates, searchManga) plus auth + user methods.
+// Thin layer above mangaService.js — no duplicated HTTP logic.
 
-// class ApiService {
-//     constructor() {
-//         this.baseURL = API_BASE_URL;
-//     }
+import api from './api';
+import { mangaService } from './mangaService';
 
-//     getAuthHeaders() {
-//         const token = localStorage.getItem('access_token');
-//         return token ? { 'Authorization': `Bearer ${token}` } : {};
-//     }
+const apiService = {
+  // ── Manga listing & search (the 5 critical methods) ───────────────────────
+  getMangaList: (params = {}) => mangaService.getAllManga(params),
+  getPopularManga: () => mangaService.getPopularManga(),
+  getFeaturedManga: () => mangaService.getFeaturedManga(),
+  getLatestUpdates: () => mangaService.getLatestUpdates(),
+  searchManga: (query, filters = {}) => mangaService.searchManga(query, filters),
 
-//     async request(endpoint, options = {}) {
-//         const url = `${this.baseURL}${endpoint}`;
-        
-//         const config = {
-//             headers: {
-//                 'Content-Type': 'application/json',
-//                 ...this.getAuthHeaders(),
-//                 ...options.headers,
-//             },
-//             ...options,
-//         };
+  // ── Extra manga endpoints ─────────────────────────────────────────────────
+  getNewSeries: () => mangaService.getNewSeries(),
+  getMangaBySlug: (slug) => mangaService.getMangaBySlug(slug),
+  getMangaChapters: (slug) => mangaService.getMangaChapters(slug),
+  getChapterDetails: (chapterId) => mangaService.getChapterDetails(chapterId),
+  getGenres: () => mangaService.getGenres(),
 
-//         try {
-//             const response = await fetch(url, config);
-            
-//             // Handle token refresh
-//             if (response.status === 401) {
-//                 const refreshed = await this.refreshToken();
-//                 if (refreshed) {
-//                     // Retry original request
-//                     config.headers = {
-//                         ...config.headers,
-//                         ...this.getAuthHeaders(),
-//                     };
-//                     const retryResponse = await fetch(url, config);
-//                     return this.handleResponse(retryResponse);
-//                 }
-//                 // Redirect to login if refresh fails
-//                 localStorage.removeItem('access_token');
-//                 localStorage.removeItem('refresh_token');
-//                 window.location.href = '/login';
-//                 return null;
-//             }
+  // ── Authentication ────────────────────────────────────────────────────────
+  register: (userData) => api.post('/auth/register/', userData),
+  login: (credentials) => api.post('/auth/login/', credentials),
+  logout: () => api.post('/auth/logout/'),
+  getProfile: () => api.get('/auth/profile/'),
 
-//             return this.handleResponse(response);
-//         } catch (error) {
-//             console.error('API request failed:', error);
-//             throw error;
-//         }
-//     }
+  // ── User actions ──────────────────────────────────────────────────────────
+  getFavorites: () => mangaService.getUserFavorites(),
+  addToFavorites: (mangaId) => mangaService.addToFavorites(mangaId),
+  removeFromFavorites: (favoriteId) => mangaService.removeFromFavorites(favoriteId),
+  getReadingHistory: () => mangaService.getUserHistory(),
+  updateReadingProgress: (mangaId, chapterId, lastPage, progressPercentage) =>
+    mangaService.updateReadingProgress(mangaId, chapterId, lastPage, progressPercentage),
 
-//     async handleResponse(response) {
-//         if (response.ok) {
-//             const contentType = response.headers.get('Content-Type');
-//             if (contentType && contentType.includes('application/json')) {
-//                 return await response.json();
-//             }
-//             return await response.text();
-//         } else {
-//             const errorData = await response.json().catch(() => ({}));
-//             throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
-//         }
-//     }
+  // ── Notifications ─────────────────────────────────────────────────────────
+  getNotifications: () => api.get('/auth/notifications/'),
+  markNotificationRead: (id) => api.patch(`/auth/notifications/${id}/`, { is_read: true }),
+  markAllNotificationsRead: () => api.post('/auth/notifications/mark-all-read/'),
 
-//     async refreshToken() {
-//         const refreshToken = localStorage.getItem('refresh_token');
-//         if (!refreshToken) return false;
-
-//         try {
-//             const response = await fetch(`${this.baseURL}/auth/token/refresh/`, {
-//                 method: 'POST',
-//                 headers: { 'Content-Type': 'application/json' },
-//                 body: JSON.stringify({ refresh: refreshToken }),
-//             });
-
-//             if (response.ok) {
-//                 const data = await response.json();
-//                 localStorage.setItem('access_token', data.access);
-//                 return true;
-//             }
-//         } catch (error) {
-//             console.error('Token refresh failed:', error);
-//         }
-//         return false;
-//     }
-
-//     // Authentication methods
-//     async register(userData) {
-//         return this.request('/auth/register/', {
-//             method: 'POST',
-//             body: JSON.stringify(userData),
-//         });
-//     }
-
-//     async login(credentials) {
-//         const response = await this.request('/auth/login/', {
-//             method: 'POST',
-//             body: JSON.stringify(credentials),
-//         });
-        
-//         if (response.tokens) {
-//             localStorage.setItem('access_token', response.tokens.access);
-//             localStorage.setItem('refresh_token', response.tokens.refresh);
-//         }
-        
-//         return response;
-//     }
-
-//     async getProfile() {
-//         return this.request('/auth/profile/');
-//     }
-
-//     // Manga methods
-//     async getMangaList(params = {}) {
-//         const queryString = new URLSearchParams(params).toString();
-//         return this.request(`/v1/manga/?${queryString}`);
-//     }
-
-//     async getMangaDetail(slug) {
-//         return this.request(`/v1/manga/${slug}/`);
-//     }
-
-//     async getPopularManga() {
-//         return this.request('/v1/manga/lists/popular/');
-//     }
-
-//     async getFeaturedManga() {
-//         return this.request('/v1/manga/lists/featured/');
-//     }
-
-//     async getLatestUpdates() {
-//         return this.request('/v1/manga/lists/latest/');
-//     }
-
-//     async getNewSeries() {
-//         return this.request('/v1/manga/lists/new/');
-//     }
-
-//     async searchManga(query) {
-//         return this.request(`/v1/search/?q=${encodeURIComponent(query)}`);
-//     }
-
-//     // User methods
-//     async getFavorites() {
-//         return this.request('/v1/user/favorites/');
-//     }
-
-//     async addToFavorites(mangaId) {
-//         return this.request('/v1/user/favorites/', {
-//             method: 'POST',
-//             body: JSON.stringify({ manga_id: mangaId }),
-//         });
-//     }
-
-//     async removeFromFavorites(favoriteId) {
-//         return this.request(`/v1/user/favorites/${favoriteId}/`, {
-//             method: 'DELETE',
-//         });
-//     }
-
-//     async getReadingHistory() {
-//         return this.request('/v1/user/history/');
-//     }
-
-//     async updateReadingProgress(mangaId, chapterId, lastPage) {
-//         return this.request('/v1/user/reading-progress/', {
-//             method: 'POST',
-//             body: JSON.stringify({
-//                 manga_id: mangaId,
-//                 chapter_id: chapterId,
-//                 last_page: lastPage,
-//             }),
-//         });
-//     }
-// }
-
-// export default new ApiService();
-
-
-
-
-
-import { useState, useEffect, createContext, useContext } from 'react';
-import { authAPI } from '../services/api';
-
-const AuthContext = createContext();
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
+  // ── Comments ──────────────────────────────────────────────────────────────
+  getMangaComments: (mangaSlug) => api.get(`/manga/${mangaSlug}/comments/`),
+  postComment: (mangaSlug, content, parentId = null) =>
+    api.post(`/manga/${mangaSlug}/comments/`, { content, parent: parentId }),
+  deleteComment: (commentId) => api.delete(`/comments/${commentId}/`),
+  likeComment: (commentId) => api.post(`/comments/${commentId}/like/`),
+  dislikeComment: (commentId) => api.post(`/comments/${commentId}/dislike/`),
 };
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    const initAuth = () => {
-      const token = localStorage.getItem('accessToken');
-      const savedUser = authAPI.getCurrentUser();
-      
-      if (token && savedUser) {
-        setUser(savedUser);
-        setIsAuthenticated(true);
-      }
-      
-      setLoading(false);
-    };
-
-    initAuth();
-  }, []);
-
-  const login = async (credentials) => {
-    try {
-      const result = await authAPI.login(credentials);
-      setUser(result.user);
-      setIsAuthenticated(true);
-      return result;
-    } catch (error) {
-      throw error;
-    }
-  };
-
-  const logout = () => {
-    authAPI.logout();
-    setUser(null);
-    setIsAuthenticated(false);
-  };
-
-  const value = {
-    user,
-    isAuthenticated,
-    loading,
-    login,
-    logout
-  };
-
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
-};
-
-export { LoginForm, RegisterForm };
+export default apiService;

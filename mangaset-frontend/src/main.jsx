@@ -27,6 +27,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js'
 import '@fortawesome/fontawesome-free/css/all.min.css'
 import 'react-toastify/dist/ReactToastify.css'
 import './styles/custom.css'
+import './styles/theme.css' // MUST come last — overrides dark/light + responsive
 
 // Import du composant principal
 import App from './App.jsx'

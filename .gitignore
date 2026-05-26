@@ -1,0 +1,178 @@
+# =============================================================================
+# MangaSet — .gitignore
+# Django backend + React/Vite frontend on Windows
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Secrets & environment
+# -----------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+!.env.template
+
+# -----------------------------------------------------------------------------
+# Python / Django backend
+# -----------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+.eggs/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+MANIFEST
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Virtual environments (any common name)
+venv/
+.venv/
+env/
+.env/
+ENV/
+env.bak/
+venv.bak/
+
+# Django runtime
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+mangaset_backend/db.sqlite3
+mangaset_backend/db.sqlite3-journal
+
+# Django collected static + user uploads
+staticfiles/
+mangaset_backend/staticfiles/
+media/
+mangaset_backend/media/
+
+# Don't ignore migrations themselves — but ignore their __pycache__
+# (covered by the global __pycache__/ rule above)
+
+# Test / coverage
+.coverage
+.coverage.*
+htmlcov/
+.cache/
+.pytest_cache/
+.tox/
+.nox/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# Type checking / linting caches
+.mypy_cache/
+.pyre/
+.pytype/
+.ruff_cache/
+.dmypy.json
+dmypy.json
+
+# -----------------------------------------------------------------------------
+# Node / Vite / React frontend
+# -----------------------------------------------------------------------------
+node_modules/
+mangaset-frontend/node_modules/
+
+# Build output
+dist/
+dist-ssr/
+build/
+mangaset-frontend/dist/
+mangaset-frontend/build/
+
+# Vite / bundler caches
+.vite/
+.cache/
+.parcel-cache/
+.turbo/
+.next/
+.nuxt/
+.svelte-kit/
+
+# npm / yarn / pnpm artifacts
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.npm/
+.yarn/
+.yarn-integrity
+
+# ESLint / Prettier caches
+.eslintcache
+.stylelintcache
+.prettiercache
+
+# Test coverage (frontend)
+coverage/
+mangaset-frontend/coverage/
+
+# -----------------------------------------------------------------------------
+# IDE & editor settings
+# -----------------------------------------------------------------------------
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.example.json
+.idea/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+.history/
+.fleet/
+.zed/
+
+# -----------------------------------------------------------------------------
+# OS / filesystem clutter
+# -----------------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# -----------------------------------------------------------------------------
+# Claude / agent harness state
+# -----------------------------------------------------------------------------
+.claude/
+.cursor/
+.aider*
+
+# -----------------------------------------------------------------------------
+# Local notes & scratch
+# -----------------------------------------------------------------------------
+Untitled-*.md
+NOTES.local.md
+TODO.local.md
+scratch/
+tmp/
+*.bak
+*.tmp
+*.orig

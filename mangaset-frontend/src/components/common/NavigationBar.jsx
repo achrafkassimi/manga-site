@@ -21,6 +21,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import api from '../../services/api';
+import apiService from '../../services/apiService';
 
 const NavigationBar = () => {
   // State Management
@@ -48,34 +49,59 @@ const NavigationBar = () => {
   // Site Configuration
   const siteName = import.meta.env.VITE_SITE_NAME || 'MangaSet';
 
-  // Initialize settings
+  // Initialize language + recent searches
   useEffect(() => {
     const savedLanguage = localStorage.getItem('language') || 'fr';
     const savedSearches = JSON.parse(localStorage.getItem('recentSearches') || '[]');
-
     setLanguage(savedLanguage);
     setRecentSearches(savedSearches);
-    
-    // Mock notifications for authenticated users
-    if (isAuthenticated) {
-      setNotifications([
-        { 
-          id: 1, 
-          title: 'Nouveau chapitre disponible', 
-          message: 'One Piece Chapitre 1090', 
-          read: false, 
-          type: 'chapter' 
-        },
-        { 
-          id: 2, 
-          title: 'Manga ajouté aux favoris', 
-          message: 'Attack on Titan', 
-          read: true, 
-          type: 'favorite' 
-        }
-      ]);
-      setNotificationCount(1);
+  }, []);
+
+  // Load real notifications from the API
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setNotifications([]);
+      setNotificationCount(0);
+      return;
     }
+
+    let cancelled = false;
+    const loadNotifications = async () => {
+      try {
+        const response = await apiService.getNotifications();
+        const payload = response.data || {};
+        const list = Array.isArray(payload) ? payload : (payload.results || []);
+        if (cancelled) return;
+
+        // Normalize to the shape used in the JSX further down:
+        // { id, title, message, read, type }
+        const normalized = list.map((n) => ({
+          id: n.id,
+          title: n.title,
+          message: n.message,
+          read: n.is_read,
+          type: n.type === 'new_chapter' ? 'chapter' : 'favorite',
+          action_url: n.action_url,
+        }));
+        setNotifications(normalized);
+        setNotificationCount(
+          typeof payload.unread_count === 'number'
+            ? payload.unread_count
+            : normalized.filter((n) => !n.read).length
+        );
+      } catch (err) {
+        console.error('Failed to load notifications:', err);
+        if (!cancelled) {
+          setNotifications([]);
+          setNotificationCount(0);
+        }
+      }
+    };
+
+    loadNotifications();
+    return () => {
+      cancelled = true;
+    };
   }, [isAuthenticated]);
 
   // Handle click outside search dropdown
