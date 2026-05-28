@@ -1,0 +1,333 @@
+erDiagram
+    User ||--o| UserProfile : "1:1"
+User ||--o{ PasswordResetToken : "1:N"
+User ||--o{ UserFavorite : "1:N"
+User ||--o{ ReadingHistory : "1:N"
+User ||--o{ MangaRating : "1:N"
+User ||--o{ Comment : "1:N"
+User ||--o{ Notification : "1:N"
+User ||--o{ ChapterView : "1:N (nullable)"
+User ||--o{ BookmarkPage : "1:N"
+User ||--o{ CommentLike : "1:N"
+User ||--o{ RatingHelpful : "1:N"
+User ||--o{ SiteVisit : "1:N (nullable)"
+User ||--o{ ActivityLog : "1:N (nullable)"
+
+UserProfile }o--o{ Genre : "favorite_genres (M:N)"
+
+Manga ||--o{ Chapter : "1:N"
+Manga }o--o{ Genre : "MangaGenre (M:N)"
+Manga }o--o{ Tag : "MangaTag (M:N)"
+Manga ||--o{ UserFavorite : "1:N"
+Manga ||--o{ ReadingHistory : "1:N"
+Manga ||--o{ MangaRating : "1:N"
+Manga ||--o{ Comment : "1:N"
+Manga ||--o{ Notification : "1:N"
+
+Genre ||--o| Genre : "parent_genre (self-FK)"
+
+Chapter ||--o{ Comment : "1:N"
+Chapter ||--o{ Notification : "1:N"
+Chapter ||--o{ ChapterView : "1:N"
+Chapter ||--o{ BookmarkPage : "1:N"
+Chapter ||--o{ ReadingHistory : "1:N (chapter pointer)"
+
+Comment ||--o| Comment : "replies (self-FK)"
+Comment ||--o{ CommentLike : "1:N"
+
+MangaRating ||--o{ RatingHelpful : "1:N"
+
+User {
+    int id PK
+    string username UK
+    string email
+    string password
+    bool is_staff
+    bool is_superuser
+    datetime date_joined
+    datetime last_login
+}
+
+UserProfile {
+    int id PK
+    int user_id FK, UK
+    image avatar
+    text bio
+    date date_of_birth
+    string gender
+    string country
+    string language_preference
+    string timezone
+    json reading_preferences
+    json notification_settings
+    json privacy_settings
+    bool is_verified
+    bool is_premium
+    datetime premium_expires_at
+    int total_reading_time
+}
+
+PasswordResetToken {
+    int id PK
+    int user_id FK
+    string token UK
+    datetime created_at
+    datetime expires_at
+    bool used
+}
+
+Manga {
+    int id PK
+    string title
+    string slug UK
+    json alternative_titles
+    text description
+    text synopsis
+    string author
+    string artist
+    string status
+    int publication_year
+    string original_language
+    string content_rating
+    image cover_image
+    image banner_image
+    image thumbnail
+    float average_rating
+    int total_ratings
+    int total_chapters
+    int total_volumes
+    int view_count
+    int favorite_count
+    int comment_count
+    bool is_featured
+    bool is_popular
+    bool is_trending
+    bool is_completed
+    bool is_official
+    string external_id
+    string external_source
+    datetime last_chapter_added
+    datetime created_at
+    datetime updated_at
+}
+
+Chapter {
+    int id PK
+    int manga_id FK
+    decimal chapter_number
+    int volume_number
+    string title
+    string slug
+    json pages
+    int page_count
+    decimal size_mb
+    bool is_published
+    bool is_premium
+    bool is_locked
+    datetime unlock_date
+    int view_count
+    int unique_views
+    datetime release_date
+    datetime published_at
+    datetime scheduled_release
+}
+
+Genre {
+    int id PK
+    string name UK
+    string slug
+    text description
+    string color_code
+    string icon
+    bool is_popular
+    int manga_count
+    int parent_genre_id FK
+    int display_order
+    bool is_active
+}
+
+Tag {
+    int id PK
+    string name UK
+    string slug
+    string type
+    string color_code
+    int usage_count
+    bool is_system
+}
+
+MangaGenre {
+    int id PK
+    int manga_id FK
+    int genre_id FK
+    bool is_primary
+    datetime created_at
+}
+
+MangaTag {
+    int id PK
+    int manga_id FK
+    int tag_id FK
+    int created_by_id FK
+    datetime created_at
+}
+
+UserFavorite {
+    int id PK
+    int user_id FK
+    int manga_id FK
+    datetime added_at
+    text notes
+    bool notification_enabled
+    bool is_private
+    int priority
+    json tags
+}
+
+ReadingHistory {
+    int id PK
+    int user_id FK
+    int manga_id FK
+    int chapter_id FK
+    int last_page
+    decimal progress_percentage
+    string reading_status
+    datetime first_read_at
+    datetime last_read_at
+    int total_reading_time
+    int session_count
+    string last_device
+    ip last_ip
+    bool rating_reminder_sent
+    datetime completion_date
+}
+
+MangaRating {
+    int id PK
+    int user_id FK
+    int manga_id FK
+    int rating
+    string review_title
+    text review_text
+    bool is_spoiler
+    bool is_approved
+    int helpful_votes
+    int total_votes
+    bool would_recommend
+    string favorite_aspect
+}
+
+Comment {
+    int id PK
+    int user_id FK
+    int manga_id FK
+    int chapter_id FK
+    int parent_id FK
+    text content
+    bool is_spoiler
+    bool is_approved
+    bool is_edited
+    bool is_pinned
+    int likes_count
+    int dislikes_count
+    int reply_count
+    datetime edited_at
+    datetime approved_at
+}
+
+Notification {
+    int id PK
+    int user_id FK
+    int manga_id FK
+    int chapter_id FK
+    string type
+    string title
+    text message
+    string action_url
+    bool is_read
+    bool is_email_sent
+    string priority
+    datetime read_at
+    datetime expires_at
+}
+
+ChapterView {
+    int id PK
+    int chapter_id FK
+    int user_id FK
+    ip ip_address
+    text user_agent
+    url referrer
+    string session_id
+    int pages_viewed
+    int reading_time
+    string device_type
+    string country_code
+    string region
+    datetime created_at
+}
+
+BookmarkPage {
+    int id PK
+    int user_id FK
+    int chapter_id FK
+    int page_number
+    text note
+    bool is_private
+    string bookmark_type
+}
+
+CommentLike {
+    int id PK
+    int user_id FK
+    int comment_id FK
+    string vote_type
+    datetime created_at
+}
+
+RatingHelpful {
+    int id PK
+    int user_id FK
+    int rating_id FK
+    string vote_type
+}
+
+SiteVisit {
+    int id PK
+    int user_id FK
+    ip ip_address
+    string session_id
+    string path
+    url referrer
+    string query_string
+    text user_agent
+    string device_type
+    string country_code
+    string country_name
+    string city
+    datetime created_at
+}
+
+SiteSettings {
+    int id PK
+    string key UK
+    text value
+    text description
+    string data_type
+    bool is_public
+    string category
+}
+
+ActivityLog {
+    int id PK
+    int user_id FK
+    string action_type
+    text description
+    ip ip_address
+    text user_agent
+    int manga_id FK
+    int chapter_id FK
+    json metadata
+    string severity
+    datetime created_at
+}
