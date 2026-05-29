@@ -16,17 +16,15 @@ import ScrollToTop from './components/common/ScrollToTop'
 import ProtectedRoute from './components/common/ProtectedRoute'
 import AdminRoute from './components/common/AdminRoute'
 
-import UserDashboard from './components/user/UserProfilePage'
 import LoginForm from './components/user/LoginForm'
 import RegisterForm from './components/user/RegisterForm'
-import UserProfile from './components/user/UserProfilePage'
 
 // Main Pages
 import HomePage from './pages/HomePage'
 import SearchPage from './pages/SearchPage'
+import MangaListPage from './pages/MangaListPage'
 import MangaDetailsPage from './pages/MangaDetailsPage'
 import ReaderPage from './pages/ReaderPage'
-// import AuthPage from './pages/AuthPage'
 
 import UserProfilePage from './components/user/UserProfilePage'
 
@@ -58,7 +56,10 @@ function App() {
                 
                 {/* Homepage */}
                 <Route path="/" element={<HomePage />} />
-                
+
+                {/* Manga Liste - tous les manga groupes par statut */}
+                <Route path="/manga-list" element={<MangaListPage />} />
+
                 {/* Search & Browse */}
                 <Route path="/search" element={<SearchPage />} />
                 <Route path="/browse" element={<SearchPage />} />
@@ -84,8 +85,7 @@ function App() {
                 <Route path="/login" element={<LoginForm />} />
                 <Route path="/register" element={<RegisterForm />} />
                 <Route path="/profile/:tab?" element={<UserProfilePage />} />
-                <Route path="/profile" element={<UserProfile />} />
-                <Route path="/dashboard" element={<UserDashboard />} />
+                <Route path="/dashboard" element={<UserProfilePage />} />
                 
                 <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                 <Route path="/reset-password" element={<ResetPasswordPage />} />

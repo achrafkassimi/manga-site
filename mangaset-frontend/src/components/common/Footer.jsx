@@ -375,7 +375,7 @@ const Footer = () => {
       </footer>
 
       {/* Custom Styles */}
-      <style jsx>{`
+      <style>{`
         .footer-link {
           transition: all 0.3s ease;
           display: inline-block;

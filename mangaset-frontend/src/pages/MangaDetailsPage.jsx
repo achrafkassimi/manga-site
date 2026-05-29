@@ -46,7 +46,7 @@ const MangaDetailsPage = () => {
       ]);
       
       setManga(mangaResponse.data);
-      setChapters(chaptersResponse.data.results || chaptersResponse.data);
+      setChapters(chaptersResponse.data?.results || chaptersResponse.data || []);
     } catch (error) {
       console.error('Error fetching manga details:', error);
       toast.error('Impossible de charger les détails du manga');
@@ -58,7 +58,7 @@ const MangaDetailsPage = () => {
   const handleAddToFavorites = async () => {
     if (!isAuthenticated) {
       toast.warn('Connectez-vous pour ajouter aux favoris');
-      navigate('/auth');
+      navigate('/login');
       return;
     }
 

@@ -1,6 +1,6 @@
 // src/pages/SearchPage.jsx - Recherche avancée complète
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { 
   Container, 
   Row, 
@@ -653,12 +653,12 @@ const SearchPage = () => {
                               <div className="d-flex justify-content-between align-items-start">
                                 <div className="flex-grow-1">
                                   <Card.Title as="h5">
-                                    <a 
-                                      href={`/manga/${manga.slug}`} 
+                                    <Link
+                                      to={`/manga/${manga.slug}`}
                                       className="text-decoration-none"
                                     >
                                       {manga.title}
-                                    </a>
+                                    </Link>
                                   </Card.Title>
                                   <Card.Text className="text-muted small mb-1">
                                     by {manga.author || 'Unknown'}

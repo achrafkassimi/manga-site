@@ -74,7 +74,7 @@ const ReaderPage = () => {
     <div className="reader-container">
       {/* Sticky Header */}
       <header >
-        <h1 class="center">{mangaInfo?.title || mangaSlug} - Chapter {chapterNumber}</h1>
+        <h1 className="center">{mangaInfo?.title || mangaSlug} - Chapter {chapterNumber}</h1>
         
         <nav className="reader-nav">
           <button 
@@ -87,7 +87,7 @@ const ReaderPage = () => {
           
           <select 
             value={chapterNumber}
-            onChange={(e) => goToChapter(e.target.value)}
+            onChange={(e) => goToChapter(parseInt(e.target.value, 10))}
             className="chapter-select"
           >
             {[...Array(mangaInfo?.totalChapters || 10)].map((_, i) => (

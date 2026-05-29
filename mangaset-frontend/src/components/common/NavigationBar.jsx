@@ -242,7 +242,18 @@ const NavigationBar = () => {
             >
               <i className="fas fa-search fa-lg"></i>
             </Button>
-            
+
+            {/* Mobile/Tablet Theme Toggle (icon only) */}
+            <Button
+              variant="link"
+              className={`text-decoration-none ${darkMode ? 'text-light' : 'text-dark'} p-2`}
+              onClick={toggleTheme}
+              title="Changer de thème"
+              aria-label="Changer de thème"
+            >
+              <i className={`fas ${darkMode ? 'fa-sun' : 'fa-moon'} fa-lg`}></i>
+            </Button>
+
             {/* Mobile Notifications */}
             {isAuthenticated && (
               <div className="position-relative">
@@ -276,13 +287,21 @@ const NavigationBar = () => {
               </div>
             )}
             
-            {/* Custom Mobile Menu Toggle */}
+            {/* Custom Mobile Menu Toggle (defer open to break touch-through) */}
             <button
               className={`navbar-toggler ${darkMode ? 'text-light' : 'text-dark'}`}
               type="button"
-              onClick={() => setShowMobileMenu(!showMobileMenu)}
+              style={{ touchAction: 'manipulation' }}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                // Defer past the current touch/click cycle so the synthetic
+                // mouse-click from touchend cannot bleed onto the first
+                // focusable element inside the freshly-rendered Modal.
+                setTimeout(() => setShowMobileMenu(true), 120);
+              }}
               aria-expanded={showMobileMenu}
-              aria-label="Toggle navigation"
+              aria-label="Ouvrir le menu"
             >
               <div className="navbar-toggler-icon"></div>
             </button>
@@ -292,9 +311,9 @@ const NavigationBar = () => {
           <Navbar.Collapse id="basic-navbar-nav" className="d-none d-lg-block">
             {/* Main Navigation */}
             <Nav className="me-auto">
-              <Nav.Link as={Link} to="/" className="d-flex align-items-center">
-                <i className="fas fa-home me-1"></i>
-                Accueil
+              <Nav.Link as={Link} to="/manga-list" className="d-flex align-items-center">
+                <i className="fas fa-book me-1"></i>
+                Manga Liste
               </Nav.Link>
               
               {/* Browse Dropdown */}
@@ -371,7 +390,7 @@ const NavigationBar = () => {
             {/* Desktop Search */}
             <div className="position-relative me-3" ref={searchDropdownRef}>
               <Form className="d-flex" onSubmit={handleSearchSubmit}>
-                <div className="input-group" style={{ minWidth: '300px' }}>
+                <div className="input-group" style={{ minWidth: '480px' }}>
                   <FormControl
                     ref={searchInputRef}
                     type="search"
@@ -516,11 +535,12 @@ const NavigationBar = () => {
               {/* Theme Toggle */}
               <Button
                 variant="link"
-                className={`text-decoration-none ${darkMode ? 'text-light' : 'text-dark'} me-2`}
+                className={`text-decoration-none ${darkMode ? 'text-light' : 'text-dark'} me-2 d-flex align-items-center`}
                 onClick={toggleTheme}
                 title="Changer de thème"
               >
-                <i className={`fas ${darkMode ? 'fa-sun' : 'fa-moon'} fa-lg`}></i>
+                <i className={`fas ${darkMode ? 'fa-sun' : 'fa-moon'} fa-lg me-2`}></i>
+                {/* <span>Changer de thème</span> */}
               </Button>
               
               {/* Language Selector */}
@@ -602,27 +622,15 @@ const NavigationBar = () => {
                   </NavDropdown.Item>
                 </NavDropdown>
               ) : (
-                <ButtonGroup>
-                  <Button 
-                    as={Link} 
-                    to="/login" 
-                    variant={darkMode ? 'outline-light' : 'outline-primary'}
-                    size="sm"
-                  >
-                    <i className="fas fa-sign-in-alt me-1"></i>
-                    <span className="d-none d-sm-inline">Connexion</span>
-                  </Button>
-                  <Button 
-                    as={Link} 
-                    to="/register" 
-                    variant="primary"
-                    size="sm"
-                    className="ms-1"
-                  >
-                    <i className="fas fa-user-plus me-1"></i>
-                    <span className="d-none d-sm-inline">S'inscrire</span>
-                  </Button>
-                </ButtonGroup>
+                <Button
+                  as={Link}
+                  to="/login"
+                  variant={darkMode ? 'outline-light' : 'outline-primary'}
+                  size="sm"
+                >
+                  <i className="fas fa-sign-in-alt me-1"></i>
+                  <span className="d-none d-sm-inline">Connexion</span>
+                </Button>
               )}
             </Nav>
           </Navbar.Collapse>
@@ -748,7 +756,7 @@ const NavigationBar = () => {
                       size="sm"
                       className="position-relative ms-2"
                       onClick={() => {
-                        navigate('/notifications');
+                        navigate('/profile');
                         setShowMobileMenu(false);
                       }}
                     >
@@ -777,32 +785,16 @@ const NavigationBar = () => {
               </div>
             ) : (
               <div className={`p-4 border-bottom ${darkMode ? 'border-secondary' : 'border-light'}`}>
-                <Row>
-                  <Col xs={6}>
-                    <Button 
-                      as={Link} 
-                      to="/login" 
-                      variant="primary"
-                      className="w-100"
-                      onClick={() => setShowMobileMenu(false)}
-                    >
-                      <i className="fas fa-sign-in-alt me-2"></i>
-                      Connexion
-                    </Button>
-                  </Col>
-                  <Col xs={6}>
-                    <Button 
-                      as={Link} 
-                      to="/register" 
-                      variant="outline-primary"
-                      className="w-100"
-                      onClick={() => setShowMobileMenu(false)}
-                    >
-                      <i className="fas fa-user-plus me-2"></i>
-                      S'inscrire
-                    </Button>
-                  </Col>
-                </Row>
+                <Button
+                  as={Link}
+                  to="/login"
+                  variant="primary"
+                  className="w-100"
+                  onClick={() => setShowMobileMenu(false)}
+                >
+                  <i className="fas fa-sign-in-alt me-2"></i>
+                  Connexion
+                </Button>
               </div>
             )}
 
@@ -867,17 +859,17 @@ const NavigationBar = () => {
             {/* Main Navigation */}
             <div className={`border-top ${darkMode ? 'border-secondary' : 'border-light'}`}>
               <ListGroup variant="flush">
-                <ListGroup.Item 
-                  as={Link} 
-                  to="/" 
+                <ListGroup.Item
+                  as={Link}
+                  to="/manga-list"
                   action
                   className={`d-flex align-items-center py-3 ${darkMode ? 'bg-dark text-light' : ''}`}
                   onClick={() => setShowMobileMenu(false)}
                 >
-                  <i className="fas fa-home me-3 text-primary fa-lg"></i>
+                  <i className="fas fa-book me-3 text-primary fa-lg"></i>
                   <div>
-                    <div className="fw-bold">Accueil</div>
-                    <small className="text-muted">Page principale</small>
+                    <div className="fw-bold">Manga Liste</div>
+                    <small className="text-muted">Tous les manga</small>
                   </div>
                 </ListGroup.Item>
 
@@ -1141,7 +1133,7 @@ const NavigationBar = () => {
       </Modal>
       
       {/* Custom Styles */}
-      <style jsx>{`
+      <style>{`
         .text-gradient {
           background: linear-gradient(45deg, #007bff, #6f42c1);
           -webkit-background-clip: text;

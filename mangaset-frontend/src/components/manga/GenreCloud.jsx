@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Badge, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import api from '../../services/api';
+import { mangaService } from '../../services/mangaService';
 
 const GenreCloud = () => {
   const [genres, setGenres] = useState([]);
@@ -18,7 +18,7 @@ const GenreCloud = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await api.get('/genres/');
+      const response = await mangaService.getGenres();
       
       // Handle both paginated and non-paginated responses
       const genreData = response.data.results || response.data || [];

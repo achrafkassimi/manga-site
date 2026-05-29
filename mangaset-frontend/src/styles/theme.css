@@ -457,3 +457,122 @@ button,
     animation-iteration-count: 1 !important;
   }
 }
+
+/* ============================================================
+   11. THEME-AWARE TEXT & COMPONENT OVERRIDES
+   Ensure every element follows the current theme color.
+   ============================================================ */
+
+/* Accordion (used by MangaListPage) */
+.accordion-item {
+  background-color: var(--app-surface);
+  border-color: var(--app-border);
+  color: var(--bs-body-color);
+}
+
+.accordion-button {
+  background-color: var(--app-surface-elevated);
+  color: var(--bs-body-color);
+}
+
+.accordion-button:not(.collapsed) {
+  background-color: var(--app-surface-elevated);
+  color: var(--bs-body-color);
+  box-shadow: inset 0 -1px 0 var(--app-border);
+}
+
+[data-bs-theme='dark'] .accordion-button:not(.collapsed)::after,
+[data-bs-theme='dark'] .accordion-button::after {
+  filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+.accordion-body {
+  background-color: var(--app-surface);
+  color: var(--bs-body-color);
+}
+
+/* Pagination */
+.pagination .page-link {
+  background-color: var(--app-surface);
+  border-color: var(--app-border);
+  color: var(--bs-body-color);
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+  color: #ffffff;
+}
+
+.pagination .page-item.disabled .page-link {
+  background-color: var(--app-surface);
+  color: var(--app-text-muted);
+  border-color: var(--app-border);
+}
+
+/* Nav links — ensure visible in both themes */
+.navbar .nav-link {
+  color: var(--bs-body-color);
+}
+
+.navbar .nav-link:hover,
+.navbar .nav-link:focus {
+  color: #0d6efd;
+}
+
+/* Breadcrumb on every page */
+.breadcrumb {
+  background-color: transparent;
+  color: var(--bs-body-color);
+}
+
+.breadcrumb-item.active {
+  color: var(--app-text-muted);
+}
+
+/* InputGroup text inside forms */
+.input-group-text {
+  background-color: var(--app-surface-elevated);
+  border-color: var(--app-border);
+  color: var(--bs-body-color);
+}
+
+/* Headings inherit body color */
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+  color: var(--bs-body-color);
+}
+
+/* Fix card-title and card-text to follow theme */
+.card-title,
+.card-text,
+.card-body {
+  color: var(--bs-body-color);
+}
+
+/* Force the theme toggle button text to stay readable */
+.navbar .btn-link {
+  color: var(--bs-body-color) !important;
+  text-decoration: none;
+}
+.navbar .btn-link:hover {
+  color: #0d6efd !important;
+}
+
+/* Mobile/Tablet burger menu toggle — must follow theme */
+.navbar-toggler {
+  border-color: var(--app-border) !important;
+  color: var(--bs-body-color) !important;
+}
+
+.navbar-toggler:focus {
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+[data-bs-theme='light'] .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba%2831, 41, 55, 0.85%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}
+
+[data-bs-theme='dark'] .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba%28233, 236, 239, 0.95%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+}
