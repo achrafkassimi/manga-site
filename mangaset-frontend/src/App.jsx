@@ -48,7 +48,7 @@ function App() {
           <div className="App d-flex flex-column min-vh-100">
             <ScrollToTop />
             <NavigationBar />
-            <br />
+            {/* <br /> */}
             
             <main className="flex-grow-1">
               <Routes>
@@ -158,7 +158,7 @@ function App() {
               </Routes>
             </main>
 
-            <br />
+            {/* <br /> */}
             
             <Footer />
             

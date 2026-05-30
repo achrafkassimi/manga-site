@@ -1,14 +1,17 @@
-// src/components/manga/LatestUpdates.jsx
+// src/components/manga/LatestUpdates.jsx - Mangafire-style Recently Updated grid
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Badge, Button } from 'react-bootstrap';
+import { Container, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { mangaService } from '../../services/mangaService';
 import LoadingSpinner from '../common/LoadingSpinner';
+
+const LANG_DEFAULT = 'EN';
 
 const LatestUpdates = () => {
   const [latestManga, setLatestManga] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [tab, setTab] = useState('all');
 
   useEffect(() => {
     fetchLatestUpdates();
@@ -19,12 +22,10 @@ const LatestUpdates = () => {
       setLoading(true);
       setError(null);
       const response = await mangaService.getLatestUpdates();
-      
-      // Handle both paginated and non-paginated responses
-      const mangaData = response.data.results || response.data || [];
+      const mangaData = response.data?.results || response.data || [];
       setLatestManga(mangaData);
-    } catch (error) {
-      console.error('Error fetching latest updates:', error);
+    } catch (err) {
+      console.error('Error fetching latest updates:', err);
       setError('Failed to load latest updates');
       setLatestManga([]);
     } finally {
@@ -33,159 +34,147 @@ const LatestUpdates = () => {
   };
 
   const formatTimeAgo = (dateString) => {
-    if (!dateString) return 'Unknown';
-    
+    if (!dateString) return '';
     try {
       const date = new Date(dateString);
-      const now = new Date();
-      const diffInMilliseconds = now - date;
-      
-      if (isNaN(diffInMilliseconds)) return 'Unknown';
-      
-      const diffInMinutes = Math.floor(diffInMilliseconds / (1000 * 60));
-      const diffInHours = Math.floor(diffInMinutes / 60);
-      const diffInDays = Math.floor(diffInHours / 24);
-      const diffInWeeks = Math.floor(diffInDays / 7);
-      
-      if (diffInMinutes < 1) return 'Just now';
-      if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
-      if (diffInHours < 24) return `${diffInHours}h ago`;
-      if (diffInDays < 7) return `${diffInDays}d ago`;
-      if (diffInWeeks < 4) return `${diffInWeeks}w ago`;
-      
+      const diff = Date.now() - date.getTime();
+      if (Number.isNaN(diff)) return '';
+      const min = Math.floor(diff / 60000);
+      const hr = Math.floor(min / 60);
+      const day = Math.floor(hr / 24);
+      if (min < 1) return 'Just now';
+      if (min < 60) return `${min} minutes ago`;
+      if (hr < 24) return `${hr} hour${hr > 1 ? 's' : ''} ago`;
+      if (day < 30) return `${day} day${day > 1 ? 's' : ''} ago`;
       return date.toLocaleDateString();
-    } catch (error) {
-      console.error('Error formatting date:', error);
-      return 'Unknown';
+    } catch {
+      return '';
     }
   };
 
   const getImageUrl = (imageUrl) => {
     if (!imageUrl) return '/placeholder-cover.jpg';
     if (imageUrl.startsWith('http')) return imageUrl;
-    
-    const baseUrl = import.meta.env.VITE_API_URL?.replace('/api/v1', '') || 'http://localhost:8000';
+    const baseUrl =
+      import.meta.env.VITE_API_URL?.replace('/api/v1', '') || 'http://localhost:8000';
     return imageUrl.startsWith('/') ? `${baseUrl}${imageUrl}` : `${baseUrl}/${imageUrl}`;
   };
 
-  const handleRetry = () => {
-    fetchLatestUpdates();
+  const getChapterList = (manga) => {
+    if (manga.recent_chapters && Array.isArray(manga.recent_chapters) && manga.recent_chapters.length > 0) {
+      return manga.recent_chapters.slice(0, 3);
+    }
+    if (manga.latest_chapter) {
+      const c = manga.latest_chapter;
+      return [{
+        id: c.id,
+        chapter_number: c.chapter_number,
+        language: c.language || LANG_DEFAULT,
+        updated_at: c.updated_at || manga.updated_at
+      }];
+    }
+    return [];
   };
+
+  const getType = (manga) => {
+    const t = (manga.type || 'manga').toLowerCase();
+    if (t === 'manhua') return 'Manhua';
+    if (t === 'manhwa') return 'Manhwa';
+    if (t === 'novel') return 'Novel';
+    return 'Manga';
+  };
+
+  const filtered = latestManga.filter((m) => {
+    if (tab === 'all') return true;
+    return (m.type || 'manga').toLowerCase() === tab;
+  });
 
   if (loading) {
     return (
-      <section className="latest-updates-section mb-5">
-        <Container>
-          <LoadingSpinner text="Loading latest updates..." />
-        </Container>
-      </section>
+      <Container className="mf-section">
+        <LoadingSpinner text="Loading latest updates..." />
+      </Container>
     );
   }
 
   if (error) {
     return (
-      <section className="latest-updates-section mb-5">
-        <Container>
-          <div className="text-center py-5">
-            <i className="fas fa-exclamation-triangle fa-3x text-warning mb-3"></i>
-            <h4 className="text-muted">{error}</h4>
-            <Button variant="primary" onClick={handleRetry}>
-              <i className="fas fa-redo me-2"></i>
-              Try Again
-            </Button>
-          </div>
-        </Container>
-      </section>
+      <Container className="mf-section">
+        <div className="text-center py-4 text-muted">
+          <i className="fas fa-exclamation-triangle fa-2x mb-2 d-block"></i>
+          <p className="mb-3">{error}</p>
+          <Button variant="primary" size="sm" onClick={fetchLatestUpdates}>
+            <i className="fas fa-redo me-1"></i> Try Again
+          </Button>
+        </div>
+      </Container>
     );
   }
 
   return (
-    <section className="latest-updates-section mb-5">
-      <Container>
-        <div className="d-flex justify-content-between align-items-center mb-4">
-          <h2 className="section-title">
-            <i className="fas fa-clock text-info me-2"></i>
-            Latest Updates
-          </h2>
-          <Button as={Link} to="/latest" variant="outline-primary">
-            View All <i className="fas fa-arrow-right ms-1"></i>
-          </Button>
-        </div>
-        
-        {latestManga.length > 0 ? (
-          <Row>
-            {latestManga.slice(0, 6).map(manga => (
-              <Col key={manga.id} lg={4} md={6} className="mb-3">
-                <Card className="h-100 latest-update-card">
-                  <Row className="g-0 h-100">
-                    <Col xs={4}>
-                      <Card.Img
-                        src={getImageUrl(manga.cover_image)}
-                        alt={manga.title || 'Manga cover'}
-                        className="h-100 w-100"
-                        style={{ objectFit: 'cover' }}
-                        onError={(e) => {
-                          e.target.src = '/placeholder-cover.jpg';
-                        }}
-                      />
-                    </Col>
-                    <Col xs={8}>
-                      <Card.Body className="py-2 px-3 d-flex flex-column h-100">
-                        <Card.Title className="h6 mb-1">
-                          <Link 
-                            to={`/manga/${manga.slug}`} 
-                            className="text-decoration-none text-dark"
-                            title={manga.title}
-                          >
-                            <span className="text-truncate d-block">
-                              {manga.title || 'Unknown Title'}
-                            </span>
-                          </Link>
-                        </Card.Title>
-                        
-                        <Card.Text className="text-muted small mb-1">
-                          by {manga.author || 'Unknown Author'}
-                        </Card.Text>
-                        
-                        <div className="mt-auto">
-                          {manga.latest_chapter && (
-                            <div className="d-flex justify-content-between align-items-center">
-                              <Badge bg="primary" className="small">
-                                Ch. {manga.latest_chapter.chapter_number}
-                              </Badge>
-                              <small className="text-muted">
-                                {formatTimeAgo(manga.updated_at)}
-                              </small>
-                            </div>
-                          )}
-                          
-                          {!manga.latest_chapter && (
-                            <div className="d-flex justify-content-between align-items-center">
-                              <Badge bg="secondary" className="small">
-                                New Series
-                              </Badge>
-                              <small className="text-muted">
-                                {formatTimeAgo(manga.created_at)}
-                              </small>
-                            </div>
-                          )}
-                        </div>
-                      </Card.Body>
-                    </Col>
-                  </Row>
-                </Card>
-              </Col>
-            ))}
-          </Row>
-        ) : (
-          <div className="text-center py-5">
-            <i className="fas fa-calendar-times fa-3x text-muted mb-3"></i>
-            <h4 className="text-muted">No recent updates</h4>
-            <p className="text-muted">Check back later for new chapters!</p>
+    <Container className="mf-section">
+      <div className="mf-section-head">
+        <h2>Recently Updated</h2>
+        <div className="d-flex align-items-center gap-3 flex-wrap">
+          <div className="mf-tabs">
+            <button className={`mf-tab ${tab === 'all' ? 'active' : ''}`} onClick={() => setTab('all')}>All</button>
+            <button className={`mf-tab ${tab === 'manga' ? 'active' : ''}`} onClick={() => setTab('manga')}>Manga</button>
+            <button className={`mf-tab ${tab === 'manhua' ? 'active' : ''}`} onClick={() => setTab('manhua')}>Manhua</button>
+            <button className={`mf-tab ${tab === 'manhwa' ? 'active' : ''}`} onClick={() => setTab('manhwa')}>Manhwa</button>
           </div>
-        )}
-      </Container>
-    </section>
+          <Link to="/latest" className="mf-btn-primary" style={{ padding: '0.35rem 0.85rem', fontSize: '0.8rem' }}>
+            View All <i className="fas fa-arrow-right"></i>
+          </Link>
+        </div>
+      </div>
+
+      {filtered.length === 0 ? (
+        <div className="text-center py-4 text-muted">
+          <i className="fas fa-calendar-times fa-2x mb-2 d-block"></i>
+          <p className="mb-0">No recent updates</p>
+        </div>
+      ) : (
+        <div className="mf-updated-grid">
+          {filtered.slice(0, 12).map((manga) => {
+            const chapters = getChapterList(manga);
+            return (
+              <div className="mf-updated-card" key={manga.id}>
+                <Link to={`/manga/${manga.slug}`} className="mf-updated-poster">
+                  <img
+                    src={getImageUrl(manga.cover_image)}
+                    alt={manga.title}
+                    onError={(e) => { e.target.src = '/placeholder-cover.jpg'; }}
+                  />
+                </Link>
+                <div className="mf-updated-body">
+                  <span className="mf-updated-type">{getType(manga)}</span>
+                  <Link to={`/manga/${manga.slug}`} className="mf-updated-title" title={manga.title}>
+                    {manga.title || 'Unknown Title'}
+                  </Link>
+                  {chapters.length > 0 ? (
+                    <ul className="mf-chap-list">
+                      {chapters.map((c, idx) => (
+                        <li key={c.id || idx}>
+                          <Link to={`/read/${manga.slug}/${c.id || c.chapter_number}`}>
+                            <span>
+                              <span className="mf-chap-num">Chap {c.chapter_number}</span>
+                              <span className="mf-lang-flag">{(c.language || LANG_DEFAULT).toUpperCase()}</span>
+                            </span>
+                            <span>{formatTimeAgo(c.updated_at || manga.updated_at)}</span>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <small className="text-muted">No chapter yet</small>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </Container>
   );
 };
 

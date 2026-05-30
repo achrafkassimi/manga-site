@@ -27,19 +27,19 @@ const HomePage = () => {
     <div className="homepage fade-in">
       {/* Hero Section - Featured Manga */}
       <FeaturedManga />
-      <hr />
+      {/* <hr /> */}
       {/* Popular Today Section */}
       <PopularToday />
-      <hr />
+      {/* <hr /> */}
       {/* Latest Updates Section */}
       <LatestUpdates />
-      <hr />
+      {/* <hr /> */}
       {/* New Series Section */}
       <NewSeries />
-      <hr />
+      {/* <hr /> */}
       {/* Genre Cloud Section */}
       <GenreCloud />
-      <hr />
+      {/* <hr /> */}
       {/* Call to Action Section */}
       <section className="cta-section py-5 bg-light">
         <div className="container text-center">
@@ -67,7 +67,7 @@ const HomePage = () => {
           </div>
         </div>
       </section>
-      <hr />
+      {/* <hr /> */}
       {/* Features Section */}
       <section className="features-section py-5">
         <div className="container">
@@ -110,7 +110,7 @@ const HomePage = () => {
           </div>
         </div>
       </section>
-      <hr />
+      {/* <hr /> */}
       {/* Statistics Section */}
       <section className="stats-section py-5 bg-dark text-white">
         <div className="container">
@@ -143,7 +143,7 @@ const HomePage = () => {
         </div>
       </section>
 
-      <hr />
+      {/* <hr /> */}
     </div>
   );
 };
