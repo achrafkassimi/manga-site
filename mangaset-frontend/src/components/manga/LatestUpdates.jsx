@@ -122,9 +122,9 @@ const LatestUpdates = () => {
             <button className={`mf-tab ${tab === 'manhua' ? 'active' : ''}`} onClick={() => setTab('manhua')}>Manhua</button>
             <button className={`mf-tab ${tab === 'manhwa' ? 'active' : ''}`} onClick={() => setTab('manhwa')}>Manhwa</button>
           </div>
-          <Link to="/latest" className="mf-btn-primary" style={{ padding: '0.35rem 0.85rem', fontSize: '0.8rem' }}>
+          {/* <Link to="/latest" className="mf-btn-primary" style={{ padding: '0.35rem 0.85rem', fontSize: '0.8rem' }}>
             View All <i className="fas fa-arrow-right"></i>
-          </Link>
+          </Link> */}
         </div>
       </div>
 

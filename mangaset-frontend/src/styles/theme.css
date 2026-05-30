@@ -510,14 +510,258 @@ button,
   border-color: var(--app-border);
 }
 
-/* Nav links — ensure visible in both themes */
-.navbar .nav-link {
-  color: var(--bs-body-color);
+/* Nav links — simple, no transform, no transition, just bg color change */
+.navbar .nav-link,
+.navbar .dropdown-toggle.nav-link,
+.navbar .navbar-nav .nav-link {
+  color: var(--bs-body-color) !important;
+  font-weight: 500;
+  padding: 0.5rem 0.85rem;
+  border-radius: 6px;
+  transition: none !important;
+  transform: none !important;
+  white-space: nowrap;
+  display: inline-flex !important;
+  align-items: center;
 }
 
 .navbar .nav-link:hover,
-.navbar .nav-link:focus {
-  color: #0d6efd;
+.navbar .nav-link:focus,
+.navbar .dropdown-toggle.nav-link:hover,
+.navbar .dropdown-toggle.nav-link:focus {
+  color: var(--bs-body-color) !important;
+  background-color: var(--mf-tag-bg, rgba(0, 0, 0, 0.06)) !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+/* Active dropdown toggle (menu open) — same simple bg */
+.navbar .nav-item.show .nav-link,
+.navbar .nav-item.show .dropdown-toggle {
+  color: var(--bs-body-color) !important;
+  background-color: var(--mf-tag-bg, rgba(0, 0, 0, 0.06)) !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+/* Spacing between navbar items (Manga Liste / Browse / Genres + right group) */
+.navbar .navbar-nav {
+  gap: 0.40rem;
+  align-items: center;
+}
+
+.navbar .navbar-brand {
+  margin-right: 1.25rem;
+  white-space: nowrap;
+}
+
+/* Narrow the navbar container so elements pull toward center on wide screens */
+.navbar > .container,
+.navbar > .container-fluid {
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Limit the search input so it doesn't stretch all the way */
+.navbar .input-group {
+  max-width: 420px;
+}
+
+/* Notification dropdown — mangafire-style header + empty state */
+.mf-notif-dropdown .dropdown-menu {
+  padding: 0;
+}
+
+.mf-notif-head {
+  background-color: var(--app-surface-subtle, var(--app-surface));
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+
+.mf-notif-head .btn-link {
+  color: var(--mf-primary, #ff7a00) !important;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.mf-notif-head .btn-link:hover {
+  color: var(--mf-primary-hover, #ff8d22) !important;
+}
+
+.mf-notif-head .btn-link:disabled {
+  color: var(--app-text-muted) !important;
+  opacity: 0.7;
+}
+
+/* Authenticated user dropdown (avatar + username) */
+.navbar #user-dropdown {
+  white-space: nowrap;
+  display: inline-flex !important;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.7rem !important;
+}
+
+.navbar #user-dropdown img.rounded-circle {
+  width: 28px;
+  height: 28px;
+  object-fit: cover;
+}
+
+.navbar #user-dropdown::after {
+  margin-left: 0.3rem;
+}
+
+/* Notification + settings + language buttons in navbar — uniform sizing */
+.navbar .nav-link .fa-bell,
+.navbar .btn-link .fa-cog,
+.navbar .btn-link .fa-sun,
+.navbar .btn-link .fa-moon {
+  font-size: 1rem;
+}
+
+.navbar .btn-link {
+  padding: 0.4rem 0.6rem !important;
+  white-space: nowrap;
+}
+
+/* SearchPage Genres filter sidebar — polished list with custom checkboxes */
+.genre-filter {
+  background-color: var(--app-surface) !important;
+  border: 1px solid var(--app-border) !important;
+  border-radius: 8px;
+  padding: 0.4rem !important;
+  max-height: 240px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--app-border) transparent;
+}
+
+.genre-filter::-webkit-scrollbar { width: 6px; }
+.genre-filter::-webkit-scrollbar-track { background: transparent; }
+.genre-filter::-webkit-scrollbar-thumb {
+  background: var(--app-border);
+  border-radius: 3px;
+}
+.genre-filter::-webkit-scrollbar-thumb:hover { background: var(--app-text-muted); }
+
+.genre-filter .form-check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  cursor: pointer;
+  min-height: auto;
+}
+
+.genre-filter .form-check:hover {
+  background-color: var(--mf-tag-bg, rgba(0, 0, 0, 0.04));
+}
+
+.genre-filter .form-check-input {
+  width: 1.05rem;
+  height: 1.05rem;
+  margin: 0;
+  flex-shrink: 0;
+  cursor: pointer;
+  accent-color: var(--mf-primary, #ff7a00);
+  float: none;
+}
+
+.genre-filter .form-check-input:checked {
+  background-color: var(--mf-primary, #ff7a00);
+  border-color: var(--mf-primary, #ff7a00);
+}
+
+.genre-filter .form-check-label {
+  cursor: pointer;
+  font-size: 0.88rem;
+  color: var(--bs-body-color);
+  flex: 1;
+  user-select: none;
+  margin: 0;
+}
+
+.genre-filter .form-check-label small {
+  color: var(--app-text-muted);
+  font-size: 0.78rem;
+  margin-left: 0.2rem;
+}
+
+/* Standard navbar dropdown menu polish */
+.navbar .dropdown-menu {
+  background-color: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  padding: 0.5rem;
+  margin-top: 0.4rem !important;
+  box-shadow: 0 8px 24px var(--app-shadow-color);
+  min-width: 220px;
+}
+
+.navbar .dropdown-item {
+  color: var(--bs-body-color);
+  padding: 0.55rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.92rem;
+  transition: none !important;
+  transform: none !important;
+}
+
+.navbar .dropdown-item:hover,
+.navbar .dropdown-item:focus {
+  background-color: var(--mf-tag-bg, rgba(0, 0, 0, 0.06)) !important;
+  color: var(--bs-body-color) !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+.navbar .dropdown-divider {
+  border-top: 1px solid var(--app-border);
+  margin: 0.4rem 0;
+}
+
+/* Mega-menu dropdown for Genres (mangafire 3-column grid) */
+.mf-mega-dropdown .dropdown-menu.show {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(140px, 1fr));
+  gap: 0.15rem;
+  min-width: 560px;
+  padding: 0.75rem;
+}
+
+.mf-mega-dropdown .dropdown-menu .dropdown-item {
+  padding: 0.45rem 0.85rem;
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+
+.mf-mega-dropdown .dropdown-menu .dropdown-item > i { display: none; }
+
+.mf-mega-dropdown .dropdown-menu .dropdown-item:hover,
+.mf-mega-dropdown .dropdown-menu .dropdown-item:focus,
+.mf-mega-dropdown .dropdown-menu .dropdown-item.active {
+  background-color: var(--mf-tag-bg, rgba(0, 0, 0, 0.06)) !important;
+  color: var(--bs-body-color) !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+@media (max-width: 767px) {
+  .mf-mega-dropdown .dropdown-menu.show {
+    grid-template-columns: repeat(2, 1fr);
+    min-width: 360px;
+  }
+}
+
+@media (max-width: 480px) {
+  .mf-mega-dropdown .dropdown-menu.show {
+    grid-template-columns: 1fr;
+    min-width: 240px;
+  }
 }
 
 /* Breadcrumb on every page */
@@ -591,6 +835,17 @@ h1, h2, h3, h4, h5, h6,
 }
 
 .mf-section { margin-bottom: 2.5rem; }
+
+/* Expand mangafire home sections wider than default Bootstrap container */
+@media (min-width: 1200px) {
+  .container.mf-section { max-width: 1200px; }
+}
+@media (min-width: 1400px) {
+  .container.mf-section { max-width: 1400px; }
+}
+@media (min-width: 1700px) {
+  .container.mf-section { max-width: 1450px; }
+}
 
 .mf-section-head {
   display: flex;
@@ -1255,12 +1510,44 @@ h1, h2, h3, h4, h5, h6,
   scrollbar-width: thin;
 }
 
-.mf-small-row::-webkit-scrollbar { height: 6px; }
-.mf-small-row::-webkit-scrollbar-thumb { background: var(--app-border); border-radius: 3px; }
+.mf-small-row { scrollbar-width: none; -ms-overflow-style: none; }
+.mf-small-row::-webkit-scrollbar { display: none; height: 0; width: 0; }
+
+/* Pagination dots strip (used under .mf-small-row) */
+.mf-dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 1rem;
+}
+
+.mf-dot {
+  width: 16px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--app-border);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: var(--app-transition);
+}
+
+.mf-dot:hover { background: var(--mf-tag-hover-bg); }
+
+.mf-dot.active {
+  width: 32px;
+  background: #0d6efd;
+}
+
+.mf-small-row { --per-view: 7; }
+
+@media (max-width: 1199px) { .mf-small-row { --per-view: 5; } }
+@media (max-width: 767px)  { .mf-small-row { --per-view: 3; } }
+@media (max-width: 480px)  { .mf-small-row { --per-view: 2; } }
 
 .mf-small-card {
-  flex: 0 0 auto;
-  width: 130px;
+  flex: 0 0 calc((100% - (var(--per-view) - 1) * 0.85rem) / var(--per-view));
   text-decoration: none;
   color: var(--bs-body-color);
   scroll-snap-align: start;
@@ -1287,6 +1574,7 @@ h1, h2, h3, h4, h5, h6,
 .mf-small-title {
   font-size: 0.82rem;
   font-weight: 500;
+  text-align: center;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;

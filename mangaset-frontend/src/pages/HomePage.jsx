@@ -25,6 +25,7 @@ const HomePage = () => {
 
   return (
     <div className="homepage fade-in">
+      <br></br>
       {/* Hero Section - Featured Manga */}
       <FeaturedManga />
       {/* <hr /> */}
@@ -40,8 +41,9 @@ const HomePage = () => {
       {/* Genre Cloud Section */}
       <GenreCloud />
       {/* <hr /> */}
+      
       {/* Call to Action Section */}
-      <section className="cta-section py-5 bg-light">
+      {/* <section className="cta-section py-5 bg-light">
         <div className="container text-center">
           <div className="row justify-content-center">
             <div className="col-lg-8">
@@ -66,10 +68,11 @@ const HomePage = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
       {/* <hr /> */}
+
       {/* Features Section */}
-      <section className="features-section py-5">
+      {/* <section className="features-section py-5">
         <div className="container">
           <div className="row text-center">
             <div className="col-lg-4 mb-4">
@@ -109,10 +112,11 @@ const HomePage = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
       {/* <hr /> */}
+
       {/* Statistics Section */}
-      <section className="stats-section py-5 bg-dark text-white">
+      {/* <section className="stats-section py-5 bg-dark text-white">
         <div className="container">
           <div className="row text-center">
             <div className="col-6 col-md-3 mb-4 mb-md-0">
@@ -141,7 +145,7 @@ const HomePage = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* <hr /> */}
     </div>

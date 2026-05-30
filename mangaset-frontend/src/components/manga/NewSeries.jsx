@@ -1,5 +1,5 @@
-// src/components/manga/NewSeries.jsx - Mangafire-style "New Release" horizontal swiper
-import React, { useState, useEffect, useRef } from 'react';
+// src/components/manga/NewSeries.jsx - Mangafire-style "New Release" horizontal swiper with dot pagination
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Container, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { mangaService } from '../../services/mangaService';
@@ -9,6 +9,8 @@ const NewSeries = () => {
   const [newManga, setNewManga] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [pageCount, setPageCount] = useState(1);
+  const [activePage, setActivePage] = useState(0);
   const rowRef = useRef(null);
 
   useEffect(() => {
@@ -39,10 +41,50 @@ const NewSeries = () => {
     return imageUrl.startsWith('/') ? `${baseUrl}${imageUrl}` : `${baseUrl}/${imageUrl}`;
   };
 
-  const scroll = (delta) => {
+  // Recompute pagination on resize / data change
+  const recompute = useCallback(() => {
+    const el = rowRef.current;
+    if (!el) return;
+    const overflow = el.scrollWidth - el.clientWidth;
+    if (overflow <= 0) {
+      setPageCount(1);
+      setActivePage(0);
+      return;
+    }
+    const count = Math.ceil(el.scrollWidth / el.clientWidth);
+    setPageCount(Math.max(1, count));
+    const ratio = el.scrollLeft / overflow;
+    setActivePage(Math.round(ratio * (count - 1)));
+  }, []);
+
+  useEffect(() => {
+    recompute();
+    const onResize = () => recompute();
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, [newManga, recompute]);
+
+  const onScroll = () => {
+    const el = rowRef.current;
+    if (!el || pageCount <= 1) return;
+    const overflow = el.scrollWidth - el.clientWidth;
+    if (overflow <= 0) return;
+    const ratio = el.scrollLeft / overflow;
+    setActivePage(Math.round(ratio * (pageCount - 1)));
+  };
+
+  const scrollBy = (delta) => {
     if (rowRef.current) {
       rowRef.current.scrollBy({ left: delta, behavior: 'smooth' });
     }
+  };
+
+  const goToPage = (i) => {
+    const el = rowRef.current;
+    if (!el || pageCount <= 1) return;
+    const overflow = el.scrollWidth - el.clientWidth;
+    const target = (overflow * i) / (pageCount - 1);
+    el.scrollTo({ left: target, behavior: 'smooth' });
   };
 
   if (loading) {
@@ -76,7 +118,7 @@ const NewSeries = () => {
             type="button"
             className="mf-trending-arrow"
             style={{ width: 32, height: 32, background: 'var(--mf-tag-bg)', color: 'var(--bs-body-color)' }}
-            onClick={() => scroll(-400)}
+            onClick={() => scrollBy(-400)}
             aria-label="Scroll left"
           >
             <i className="fas fa-chevron-left"></i>
@@ -85,14 +127,11 @@ const NewSeries = () => {
             type="button"
             className="mf-trending-arrow"
             style={{ width: 32, height: 32, background: 'var(--mf-tag-bg)', color: 'var(--bs-body-color)' }}
-            onClick={() => scroll(400)}
+            onClick={() => scrollBy(400)}
             aria-label="Scroll right"
           >
             <i className="fas fa-chevron-right"></i>
           </button>
-          <Link to="/new" className="mf-btn-primary" style={{ padding: '0.35rem 0.85rem', fontSize: '0.8rem' }}>
-            View All <i className="fas fa-arrow-right"></i>
-          </Link>
         </div>
       </div>
 
@@ -102,22 +141,38 @@ const NewSeries = () => {
           <p className="mb-0">No new series available</p>
         </div>
       ) : (
-        <div className="mf-small-row" ref={rowRef}>
-          {newManga.slice(0, 20).map((manga) => (
-            <Link to={`/manga/${manga.slug}`} className="mf-small-card" key={manga.id}>
-              <div className="mf-small-poster">
-                <img
-                  src={getImageUrl(manga.cover_image)}
-                  alt={manga.title}
-                  onError={(e) => { e.target.src = '/placeholder-cover.jpg'; }}
+        <>
+          <div className="mf-small-row" ref={rowRef} onScroll={onScroll}>
+            {newManga.slice(0, 14).map((manga) => (
+              <Link to={`/manga/${manga.slug}`} className="mf-small-card" key={manga.id}>
+                <div className="mf-small-poster">
+                  <img
+                    src={getImageUrl(manga.cover_image)}
+                    alt={manga.title}
+                    onError={(e) => { e.target.src = '/placeholder-cover.jpg'; }}
+                  />
+                </div>
+                <div className="mf-small-title" title={manga.title}>
+                  {manga.title || 'Unknown Title'}
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          {pageCount > 1 && (
+            <div className="mf-dots">
+              {Array.from({ length: pageCount }, (_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  className={`mf-dot ${i === activePage ? 'active' : ''}`}
+                  onClick={() => goToPage(i)}
+                  aria-label={`Go to page ${i + 1}`}
                 />
-              </div>
-              <div className="mf-small-title" title={manga.title}>
-                {manga.title || 'Unknown Title'}
-              </div>
-            </Link>
-          ))}
-        </div>
+              ))}
+            </div>
+          )}
+        </>
       )}
     </Container>
   );

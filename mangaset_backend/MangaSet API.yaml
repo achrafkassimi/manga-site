@@ -1,0 +1,2792 @@
+openapi: 3.0.3
+info:
+  title: MangaSet API
+  version: 1.0.0
+  description: REST API for the MangaSet manga reading platform.
+paths:
+  /api/v1/admin/dashboard/stats/:
+    get:
+      operationId: v1_admin_dashboard_stats_retrieve
+      description: Get dashboard statistics for admin
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/manga/:
+    get:
+      operationId: v1_admin_manga_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMangaDetailList'
+          description: ''
+    post:
+      operationId: v1_admin_manga_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MangaDetailRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MangaDetailRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MangaDetailRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MangaDetail'
+          description: ''
+  /api/v1/admin/manga/{slug}/:
+    get:
+      operationId: v1_admin_manga_retrieve
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MangaDetail'
+          description: ''
+    put:
+      operationId: v1_admin_manga_update
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MangaDetailRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MangaDetailRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MangaDetailRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MangaDetail'
+          description: ''
+    patch:
+      operationId: v1_admin_manga_partial_update
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedMangaDetailRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedMangaDetailRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedMangaDetailRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MangaDetail'
+          description: ''
+    delete:
+      operationId: v1_admin_manga_destroy
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/admin/manga/bulk-actions/:
+    post:
+      operationId: v1_admin_manga_bulk_actions_create
+      description: Handle bulk operations on manga
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/admin/users/:
+    get:
+      operationId: v1_admin_users_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserList'
+          description: ''
+  /api/v1/analytics/activity/:
+    get:
+      operationId: v1_analytics_activity_retrieve
+      description: |-
+        Paginated activity log.
+        GET /api/v1/analytics/activity/?severity=error&days=7
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/analytics/dashboard/:
+    get:
+      operationId: v1_analytics_dashboard_retrieve
+      description: |-
+        Main dashboard: key metrics for the last 30 days compared to previous 30.
+        GET /api/v1/analytics/dashboard/
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/analytics/top-content/:
+    get:
+      operationId: v1_analytics_top_content_retrieve
+      description: |-
+        Top manga and chapters by all-time view count.
+        GET /api/v1/analytics/top-content/
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/analytics/users/:
+    get:
+      operationId: v1_analytics_users_retrieve
+      description: |-
+        User registration and activity stats.
+        GET /api/v1/analytics/users/
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/analytics/visits/:
+    get:
+      operationId: v1_analytics_visits_retrieve
+      description: |-
+        Paginated site visits list.
+        GET /api/v1/analytics/visits/?days=7&page=1
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/auth/change-password/:
+    post:
+      operationId: v1_auth_change_password_create
+      description: Change user password
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/auth/favorites/:
+    get:
+      operationId: v1_auth_favorites_retrieve
+      description: Manage user favorites
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: v1_auth_favorites_create
+      description: Manage user favorites
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/auth/favorites/{manga_id}/:
+    delete:
+      operationId: v1_auth_favorites_destroy
+      description: Remove manga from favorites
+      parameters:
+      - in: path
+        name: manga_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/auth/forgot-password/:
+    post:
+      operationId: v1_auth_forgot_password_create
+      description: Request password reset via email
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/auth/health/:
+    get:
+      operationId: v1_auth_health_retrieve
+      description: Health check endpoint
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/auth/history/:
+    get:
+      operationId: v1_auth_history_retrieve
+      description: Get user's reading history
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/auth/login/:
+    post:
+      operationId: v1_auth_login_create
+      description: Login user with username/email and password
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/auth/logout/:
+    post:
+      operationId: v1_auth_logout_create
+      description: Logout user by blacklisting refresh token
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/auth/notifications/:
+    get:
+      operationId: v1_auth_notifications_list
+      description: List the current user's notifications, newest first.
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedNotificationList'
+          description: ''
+  /api/v1/auth/notifications/{id}/:
+    put:
+      operationId: v1_auth_notifications_update
+      description: Mark a single notification as read/unread.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+          description: ''
+    patch:
+      operationId: v1_auth_notifications_partial_update
+      description: Mark a single notification as read/unread.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+          description: ''
+  /api/v1/auth/notifications/mark-all-read/:
+    post:
+      operationId: v1_auth_notifications_mark_all_read_create
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/auth/password/reset/:
+    post:
+      operationId: v1_auth_password_reset_create
+      description: Request password reset via email
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/auth/profile/:
+    get:
+      operationId: v1_auth_profile_retrieve
+      description: Get and update user profile with enhanced error handling
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+          description: ''
+    put:
+      operationId: v1_auth_profile_update
+      description: Get and update user profile with enhanced error handling
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserProfileRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserProfileRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserProfileRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+          description: ''
+    patch:
+      operationId: v1_auth_profile_partial_update
+      description: Get and update user profile with enhanced error handling
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserProfileRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserProfileRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserProfileRequest'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+          description: ''
+  /api/v1/auth/register/:
+    post:
+      operationId: v1_auth_register_create
+      description: Register a new user account
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/auth/reset-password/:
+    post:
+      operationId: v1_auth_reset_password_create
+      description: Confirm password reset with token
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/v1/auth/stats/:
+    get:
+      operationId: v1_auth_stats_retrieve
+      description: Get user statistics
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/auth/token/:
+    post:
+      operationId: v1_auth_token_create
+      description: |-
+        Takes a set of user credentials and returns an access and refresh JSON web
+        token pair to prove the authentication of those credentials.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomTokenObtainPairRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CustomTokenObtainPairRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CustomTokenObtainPairRequest'
+        required: true
+      responses:
+        '200':
+          description: No response body
+  /api/v1/auth/token/refresh/:
+    post:
+      operationId: v1_auth_token_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+  /api/v1/chapters/{id}/:
+    get:
+      operationId: v1_chapters_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChapterDetail'
+          description: ''
+  /api/v1/comments/{id}/:
+    get:
+      operationId: v1_comments_retrieve
+      description: Retrieve or delete a single comment. Only the author or staff can
+        delete.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+          description: ''
+    delete:
+      operationId: v1_comments_destroy
+      description: Retrieve or delete a single comment. Only the author or staff can
+        delete.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/comments/{id}/dislike/:
+    post:
+      operationId: v1_comments_dislike_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/comments/{id}/like/:
+    post:
+      operationId: v1_comments_like_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/genres/:
+    get:
+      operationId: v1_genres_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedGenreList'
+          description: ''
+  /api/v1/manga/:
+    get:
+      operationId: v1_manga_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - cancelled
+          - completed
+          - hiatus
+          - ongoing
+        description: |-
+          * `ongoing` - Ongoing
+          * `completed` - Completed
+          * `hiatus` - Hiatus
+          * `cancelled` - Cancelled
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMangaListList'
+          description: ''
+  /api/v1/manga/{manga_slug}/chapters/:
+    get:
+      operationId: v1_manga_chapters_list
+      parameters:
+      - in: path
+        name: manga_slug
+        schema:
+          type: string
+        required: true
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedChapterListList'
+          description: ''
+  /api/v1/manga/{manga_slug}/comments/:
+    get:
+      operationId: v1_manga_comments_list
+      description: List approved top-level comments for a manga and create new ones.
+      parameters:
+      - in: path
+        name: manga_slug
+        schema:
+          type: string
+        required: true
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCommentList'
+          description: ''
+    post:
+      operationId: v1_manga_comments_create
+      description: List approved top-level comments for a manga and create new ones.
+      parameters:
+      - in: path
+        name: manga_slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CommentRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CommentRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+          description: ''
+  /api/v1/manga/{slug}/:
+    get:
+      operationId: v1_manga_retrieve
+      parameters:
+      - in: path
+        name: slug
+        schema:
+          type: string
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MangaDetail'
+          description: ''
+  /api/v1/manga/lists/featured/:
+    get:
+      operationId: v1_manga_lists_featured_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMangaListList'
+          description: ''
+  /api/v1/manga/lists/latest/:
+    get:
+      operationId: v1_manga_lists_latest_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMangaListList'
+          description: ''
+  /api/v1/manga/lists/new/:
+    get:
+      operationId: v1_manga_lists_new_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMangaListList'
+          description: ''
+  /api/v1/manga/lists/popular/:
+    get:
+      operationId: v1_manga_lists_popular_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMangaListList'
+          description: ''
+  /api/v1/monitoring/activity/:
+    get:
+      operationId: v1_monitoring_activity_retrieve
+      description: GET /api/v1/monitoring/activity/?days=7&severity=error
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/monitoring/dashboard/:
+    get:
+      operationId: v1_monitoring_dashboard_retrieve
+      description: |-
+        Main monitoring dashboard — 30-day summary.
+        GET /api/v1/monitoring/dashboard/
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/monitoring/top-content/:
+    get:
+      operationId: v1_monitoring_top_content_retrieve
+      description: GET /api/v1/monitoring/top-content/
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/monitoring/users/:
+    get:
+      operationId: v1_monitoring_users_retrieve
+      description: GET /api/v1/monitoring/users/
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/monitoring/visits/:
+    get:
+      operationId: v1_monitoring_visits_retrieve
+      description: GET /api/v1/monitoring/visits/?days=7
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/v1/search/:
+    get:
+      operationId: v1_search_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMangaListList'
+          description: ''
+  /api/v1/user/favorites/:
+    get:
+      operationId: v1_user_favorites_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserFavoriteList'
+          description: ''
+    post:
+      operationId: v1_user_favorites_create
+      tags:
+      - v1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserFavoriteRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserFavoriteRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserFavoriteRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserFavorite'
+          description: ''
+  /api/v1/user/favorites/{id}/:
+    delete:
+      operationId: v1_user_favorites_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/user/history/:
+    get:
+      operationId: v1_user_history_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedReadingHistoryList'
+          description: ''
+  /api/v1/user/reading-progress/:
+    post:
+      operationId: v1_user_reading_progress_create
+      description: Update user reading progress for a specific chapter
+      tags:
+      - v1
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+components:
+  schemas:
+    ChapterDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        slug:
+          type: string
+          maxLength: 200
+          pattern: ^[-a-zA-Z0-9_]+$
+        view_count:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        chapter_number:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+          description: Allows fractional chapters like 1.5
+        volume_number:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+        title:
+          type: string
+          maxLength: 200
+        pages:
+          description: Array of image URLs or file paths
+        page_count:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        size_mb:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+        is_published:
+          type: boolean
+        is_premium:
+          type: boolean
+        is_locked:
+          type: boolean
+        unlock_date:
+          type: string
+          format: date-time
+          nullable: true
+        unique_views:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        reading_time_avg:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          description: Average reading time in seconds
+        external_id:
+          type: string
+          maxLength: 100
+        external_source:
+          type: string
+          maxLength: 50
+        original_url:
+          type: string
+          format: uri
+          maxLength: 200
+        release_date:
+          type: string
+          format: date-time
+          nullable: true
+        published_at:
+          type: string
+          format: date-time
+          nullable: true
+        scheduled_release:
+          type: string
+          format: date-time
+          nullable: true
+        meta_title:
+          type: string
+          maxLength: 200
+        meta_description:
+          type: string
+          maxLength: 300
+        manga:
+          type: integer
+      required:
+      - chapter_number
+      - created_at
+      - id
+      - manga
+      - updated_at
+    ChapterList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        chapter_number:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+          description: Allows fractional chapters like 1.5
+        title:
+          type: string
+          maxLength: 200
+        page_count:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        release_date:
+          type: string
+          format: date-time
+          nullable: true
+        view_count:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+      required:
+      - chapter_number
+      - id
+    ChapterListRequest:
+      type: object
+      properties:
+        chapter_number:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,2})?$
+          description: Allows fractional chapters like 1.5
+        title:
+          type: string
+          maxLength: 200
+        page_count:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        release_date:
+          type: string
+          format: date-time
+          nullable: true
+        view_count:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+      required:
+      - chapter_number
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        user:
+          allOf:
+          - $ref: '#/components/schemas/CommentAuthor'
+          readOnly: true
+        content:
+          type: string
+          maxLength: 1000
+        parent:
+          type: integer
+          nullable: true
+        is_spoiler:
+          type: boolean
+        is_edited:
+          type: boolean
+          readOnly: true
+        is_pinned:
+          type: boolean
+          readOnly: true
+          description: Pinned by moderator
+        likes_count:
+          type: integer
+          readOnly: true
+        dislikes_count:
+          type: integer
+          readOnly: true
+        reply_count:
+          type: integer
+          readOnly: true
+        replies:
+          type: string
+          readOnly: true
+        can_edit:
+          type: string
+          readOnly: true
+        can_delete:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        edited_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+      required:
+      - can_delete
+      - can_edit
+      - content
+      - created_at
+      - dislikes_count
+      - edited_at
+      - id
+      - is_edited
+      - is_pinned
+      - likes_count
+      - replies
+      - reply_count
+      - user
+    CommentAuthor:
+      type: object
+      description: Minimal user info embedded in comments.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        avatar_url:
+          type: string
+          readOnly: true
+      required:
+      - avatar_url
+      - id
+      - username
+    CommentAuthorRequest:
+      type: object
+      description: Minimal user info embedded in comments.
+      properties:
+        username:
+          type: string
+          minLength: 1
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+      required:
+      - username
+    CommentRequest:
+      type: object
+      properties:
+        content:
+          type: string
+          minLength: 1
+          maxLength: 1000
+        parent:
+          type: integer
+          nullable: true
+        is_spoiler:
+          type: boolean
+      required:
+      - content
+    ContentRatingEnum:
+      enum:
+      - safe
+      - suggestive
+      - erotica
+      - pornographic
+      type: string
+      description: |-
+        * `safe` - Safe
+        * `suggestive` - Suggestive
+        * `erotica` - Erotica
+        * `pornographic` - Pornographic
+    CustomTokenObtainPairRequest:
+      type: object
+      description: Custom JWT token serializer with user data
+      properties:
+        username:
+          type: string
+          writeOnly: true
+          minLength: 1
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+      required:
+      - password
+      - username
+    Genre:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 50
+        description:
+          type: string
+        color_code:
+          type: string
+          description: Hex color code
+          maxLength: 7
+      required:
+      - id
+      - name
+    GenreRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 50
+        description:
+          type: string
+        color_code:
+          type: string
+          minLength: 1
+          description: Hex color code
+          maxLength: 7
+      required:
+      - name
+    MangaDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        genres:
+          type: array
+          items:
+            $ref: '#/components/schemas/Genre'
+          readOnly: true
+        chapters:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChapterList'
+          readOnly: true
+        is_favorited:
+          type: string
+          readOnly: true
+        reading_progress:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        slug:
+          type: string
+          maxLength: 200
+          pattern: ^[-a-zA-Z0-9_]+$
+        view_count:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        average_rating:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,1}(?:\.\d{0,2})?$
+        total_ratings:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        title:
+          type: string
+          maxLength: 200
+        alternative_titles:
+          description: Alternative titles in different languages
+        description:
+          type: string
+        synopsis:
+          type: string
+          description: Short summary
+        author:
+          type: string
+          maxLength: 100
+        artist:
+          type: string
+          maxLength: 100
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        publication_year:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+        serialization:
+          type: string
+          description: Magazine or platform
+          maxLength: 100
+        original_language:
+          type: string
+          maxLength: 10
+        content_rating:
+          $ref: '#/components/schemas/ContentRatingEnum'
+        cover_image:
+          type: string
+          format: uri
+        banner_image:
+          type: string
+          format: uri
+        thumbnail:
+          type: string
+          format: uri
+        total_chapters:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        total_volumes:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        favorite_count:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        bookmark_count:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        comment_count:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        is_featured:
+          type: boolean
+        is_popular:
+          type: boolean
+        is_trending:
+          type: boolean
+        is_completed:
+          type: boolean
+        is_official:
+          type: boolean
+        external_id:
+          type: string
+          description: External API ID (e.g., MangaDex)
+          maxLength: 100
+        external_source:
+          type: string
+          maxLength: 50
+        original_source_url:
+          type: string
+          format: uri
+          maxLength: 200
+        last_external_sync:
+          type: string
+          format: date-time
+          nullable: true
+        meta_title:
+          type: string
+          maxLength: 200
+        meta_description:
+          type: string
+          maxLength: 300
+        keywords:
+          type: string
+          maxLength: 500
+        last_chapter_added:
+          type: string
+          format: date-time
+          nullable: true
+        tags:
+          type: array
+          items:
+            type: integer
+          readOnly: true
+      required:
+      - author
+      - chapters
+      - created_at
+      - description
+      - genres
+      - id
+      - is_favorited
+      - reading_progress
+      - tags
+      - title
+      - updated_at
+    MangaDetailRequest:
+      type: object
+      properties:
+        slug:
+          type: string
+          maxLength: 200
+          pattern: ^[-a-zA-Z0-9_]+$
+        view_count:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        average_rating:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,1}(?:\.\d{0,2})?$
+        total_ratings:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+        alternative_titles:
+          description: Alternative titles in different languages
+        description:
+          type: string
+          minLength: 1
+        synopsis:
+          type: string
+          description: Short summary
+        author:
+          type: string
+          minLength: 1
+          maxLength: 100
+        artist:
+          type: string
+          maxLength: 100
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        publication_year:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+        serialization:
+          type: string
+          description: Magazine or platform
+          maxLength: 100
+        original_language:
+          type: string
+          minLength: 1
+          maxLength: 10
+        content_rating:
+          $ref: '#/components/schemas/ContentRatingEnum'
+        cover_image:
+          type: string
+          format: binary
+        banner_image:
+          type: string
+          format: binary
+        thumbnail:
+          type: string
+          format: binary
+        total_chapters:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        total_volumes:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        favorite_count:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        bookmark_count:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        comment_count:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        is_featured:
+          type: boolean
+        is_popular:
+          type: boolean
+        is_trending:
+          type: boolean
+        is_completed:
+          type: boolean
+        is_official:
+          type: boolean
+        external_id:
+          type: string
+          description: External API ID (e.g., MangaDex)
+          maxLength: 100
+        external_source:
+          type: string
+          maxLength: 50
+        original_source_url:
+          type: string
+          format: uri
+          maxLength: 200
+        last_external_sync:
+          type: string
+          format: date-time
+          nullable: true
+        meta_title:
+          type: string
+          maxLength: 200
+        meta_description:
+          type: string
+          maxLength: 300
+        keywords:
+          type: string
+          maxLength: 500
+        last_chapter_added:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - author
+      - description
+      - title
+    MangaList:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 200
+        slug:
+          type: string
+          maxLength: 200
+          pattern: ^[-a-zA-Z0-9_]+$
+        description:
+          type: string
+        author:
+          type: string
+          maxLength: 100
+        artist:
+          type: string
+          maxLength: 100
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        cover_image:
+          type: string
+          format: uri
+        average_rating:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,1}(?:\.\d{0,2})?$
+        total_ratings:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        total_chapters:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        genres:
+          type: array
+          items:
+            $ref: '#/components/schemas/Genre'
+          readOnly: true
+        latest_chapter:
+          type: string
+          readOnly: true
+        view_count:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - author
+      - created_at
+      - description
+      - genres
+      - id
+      - latest_chapter
+      - title
+      - updated_at
+    MangaListRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+        slug:
+          type: string
+          maxLength: 200
+          pattern: ^[-a-zA-Z0-9_]+$
+        description:
+          type: string
+          minLength: 1
+        author:
+          type: string
+          minLength: 1
+          maxLength: 100
+        artist:
+          type: string
+          maxLength: 100
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        cover_image:
+          type: string
+          format: binary
+        average_rating:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,1}(?:\.\d{0,2})?$
+        total_ratings:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        total_chapters:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        view_count:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+      required:
+      - author
+      - description
+      - title
+    Notification:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        type:
+          allOf:
+          - $ref: '#/components/schemas/TypeEnum'
+          readOnly: true
+        title:
+          type: string
+          readOnly: true
+        message:
+          type: string
+          readOnly: true
+        action_url:
+          type: string
+          readOnly: true
+        is_read:
+          type: boolean
+          readOnly: true
+        priority:
+          allOf:
+          - $ref: '#/components/schemas/PriorityEnum'
+          readOnly: true
+        icon:
+          type: string
+          readOnly: true
+        color_class:
+          type: string
+          readOnly: true
+        target_title:
+          type: string
+          readOnly: true
+        read_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - action_url
+      - color_class
+      - created_at
+      - icon
+      - id
+      - is_read
+      - message
+      - priority
+      - read_at
+      - target_title
+      - title
+      - type
+    PaginatedChapterListList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChapterList'
+    PaginatedCommentList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Comment'
+    PaginatedGenreList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Genre'
+    PaginatedMangaDetailList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/MangaDetail'
+    PaginatedMangaListList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/MangaList'
+    PaginatedNotificationList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Notification'
+    PaginatedReadingHistoryList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReadingHistory'
+    PaginatedUserFavoriteList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserFavorite'
+    PaginatedUserList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+    PatchedMangaDetailRequest:
+      type: object
+      properties:
+        slug:
+          type: string
+          maxLength: 200
+          pattern: ^[-a-zA-Z0-9_]+$
+        view_count:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        average_rating:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,1}(?:\.\d{0,2})?$
+        total_ratings:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+        alternative_titles:
+          description: Alternative titles in different languages
+        description:
+          type: string
+          minLength: 1
+        synopsis:
+          type: string
+          description: Short summary
+        author:
+          type: string
+          minLength: 1
+          maxLength: 100
+        artist:
+          type: string
+          maxLength: 100
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        publication_year:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+        serialization:
+          type: string
+          description: Magazine or platform
+          maxLength: 100
+        original_language:
+          type: string
+          minLength: 1
+          maxLength: 10
+        content_rating:
+          $ref: '#/components/schemas/ContentRatingEnum'
+        cover_image:
+          type: string
+          format: binary
+        banner_image:
+          type: string
+          format: binary
+        thumbnail:
+          type: string
+          format: binary
+        total_chapters:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        total_volumes:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        favorite_count:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        bookmark_count:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        comment_count:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        is_featured:
+          type: boolean
+        is_popular:
+          type: boolean
+        is_trending:
+          type: boolean
+        is_completed:
+          type: boolean
+        is_official:
+          type: boolean
+        external_id:
+          type: string
+          description: External API ID (e.g., MangaDex)
+          maxLength: 100
+        external_source:
+          type: string
+          maxLength: 50
+        original_source_url:
+          type: string
+          format: uri
+          maxLength: 200
+        last_external_sync:
+          type: string
+          format: date-time
+          nullable: true
+        meta_title:
+          type: string
+          maxLength: 200
+        meta_description:
+          type: string
+          maxLength: 300
+        keywords:
+          type: string
+          maxLength: 500
+        last_chapter_added:
+          type: string
+          format: date-time
+          nullable: true
+    PatchedUserProfileRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        bio:
+          type: string
+        avatar:
+          type: string
+          format: binary
+          nullable: true
+        birth_date:
+          type: string
+          format: date
+          nullable: true
+        preferred_language:
+          type: string
+          minLength: 1
+    PriorityEnum:
+      enum:
+      - low
+      - medium
+      - high
+      type: string
+      description: |-
+        * `low` - Low
+        * `medium` - Medium
+        * `high` - High
+    ReadingHistory:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        manga:
+          allOf:
+          - $ref: '#/components/schemas/MangaList'
+          readOnly: true
+        chapter_info:
+          allOf:
+          - $ref: '#/components/schemas/ChapterList'
+          readOnly: true
+        last_page:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        progress_percentage:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,2})?$
+        reading_status:
+          $ref: '#/components/schemas/ReadingStatusEnum'
+        first_read_at:
+          type: string
+          format: date-time
+          readOnly: true
+        last_read_at:
+          type: string
+          format: date-time
+          readOnly: true
+        total_reading_time:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          description: Total reading time in seconds
+        session_count:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+        last_device:
+          type: string
+          maxLength: 50
+        last_ip:
+          type: string
+          nullable: true
+        rating_reminder_sent:
+          type: boolean
+        completion_date:
+          type: string
+          format: date-time
+          nullable: true
+        user:
+          type: integer
+        chapter:
+          type: integer
+          nullable: true
+      required:
+      - chapter_info
+      - first_read_at
+      - id
+      - last_read_at
+      - manga
+      - user
+    ReadingStatusEnum:
+      enum:
+      - reading
+      - completed
+      - dropped
+      - plan_to_read
+      - on_hold
+      type: string
+      description: |-
+        * `reading` - Reading
+        * `completed` - Completed
+        * `dropped` - Dropped
+        * `plan_to_read` - Plan to Read
+        * `on_hold` - On Hold
+    StatusEnum:
+      enum:
+      - ongoing
+      - completed
+      - hiatus
+      - cancelled
+      type: string
+      description: |-
+        * `ongoing` - Ongoing
+        * `completed` - Completed
+        * `hiatus` - Hiatus
+        * `cancelled` - Cancelled
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+      required:
+      - access
+      - refresh
+    TokenRefreshRequest:
+      type: object
+      properties:
+        refresh:
+          type: string
+          minLength: 1
+      required:
+      - refresh
+    TypeEnum:
+      enum:
+      - new_chapter
+      - manga_update
+      - comment_reply
+      - favorite_update
+      - system_message
+      - rating_like
+      - comment_like
+      type: string
+      description: |-
+        * `new_chapter` - New Chapter
+        * `manga_update` - Manga Update
+        * `comment_reply` - Comment Reply
+        * `favorite_update` - Favorite Update
+        * `system_message` - System Message
+        * `rating_like` - Rating Liked
+        * `comment_like` - Comment Liked
+    User:
+      type: object
+      description: Standard user serializer (used by AdminUserListView + others).
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        full_name:
+          type: string
+          readOnly: true
+        date_joined:
+          type: string
+          format: date-time
+          readOnly: true
+        last_login:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        is_active:
+          type: boolean
+          readOnly: true
+          title: Active
+          description: Designates whether this user should be treated as active. Unselect
+            this instead of deleting accounts.
+        is_staff:
+          type: boolean
+          readOnly: true
+          title: Staff status
+          description: Designates whether the user can log into this admin site.
+      required:
+      - date_joined
+      - full_name
+      - id
+      - is_active
+      - is_staff
+      - last_login
+      - username
+    UserFavorite:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        manga:
+          allOf:
+          - $ref: '#/components/schemas/MangaList'
+          readOnly: true
+        added_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - added_at
+      - id
+      - manga
+    UserFavoriteRequest:
+      type: object
+      properties:
+        manga_id:
+          type: integer
+          writeOnly: true
+      required:
+      - manga_id
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          readOnly: true
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        full_name:
+          type: string
+          readOnly: true
+        bio:
+          type: string
+        avatar:
+          type: string
+          format: uri
+          nullable: true
+        avatar_url:
+          type: string
+          readOnly: true
+        birth_date:
+          type: string
+          format: date
+          nullable: true
+        preferred_language:
+          type: string
+        date_joined:
+          type: string
+          format: date-time
+          readOnly: true
+        last_login:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        is_staff:
+          type: boolean
+          readOnly: true
+          title: Staff status
+          description: Designates whether the user can log into this admin site.
+        is_superuser:
+          type: boolean
+          readOnly: true
+          title: Superuser status
+          description: Designates that this user has all permissions without explicitly
+            assigning them.
+      required:
+      - avatar_url
+      - date_joined
+      - full_name
+      - id
+      - is_staff
+      - is_superuser
+      - last_login
+      - username
+    UserProfileRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        bio:
+          type: string
+        avatar:
+          type: string
+          format: binary
+          nullable: true
+        birth_date:
+          type: string
+          format: date
+          nullable: true
+        preferred_language:
+          type: string
+          minLength: 1
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

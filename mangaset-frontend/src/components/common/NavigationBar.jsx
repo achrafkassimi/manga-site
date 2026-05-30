@@ -316,74 +316,48 @@ const NavigationBar = () => {
                 Manga Liste
               </Nav.Link>
               
-              {/* Browse Dropdown */}
-              <NavDropdown 
-                title={
-                  <>
-                    <i className="fas fa-list me-1"></i>
-                    Browse
-                  </>
-                } 
-                id="browse-dropdown"
-              >
-                <NavDropdown.Item as={Link} to="/popular">
-                  <i className="fas fa-fire me-2 text-danger"></i>
-                  Populaires
-                </NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/latest">
-                  <i className="fas fa-clock me-2 text-info"></i>
-                  Dernières MAJ
-                </NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/new">
-                  <i className="fas fa-star me-2 text-success"></i>
-                  Nouvelles Séries
-                </NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/completed">
-                  <i className="fas fa-check-circle me-2 text-primary"></i>
-                  Terminées
-                </NavDropdown.Item>
+              {/* Browse Dropdown — no icons, mangafire-style */}
+              <NavDropdown title="Browse" id="browse-dropdown">
+                <NavDropdown.Item as={Link} to="/popular">Populaires</NavDropdown.Item>
+                <NavDropdown.Item as={Link} to="/latest">Dernieres MAJ</NavDropdown.Item>
+                <NavDropdown.Item as={Link} to="/new">Nouvelles Series</NavDropdown.Item>
+                <NavDropdown.Item as={Link} to="/completed">Terminees</NavDropdown.Item>
                 <NavDropdown.Divider />
                 <NavDropdown.Item as={Link} to="/search" className="fw-bold">
-                  <i className="fas fa-search me-2"></i>
-                  Recherche Avancée
+                  Recherche Avancee
                 </NavDropdown.Item>
               </NavDropdown>
-              
-              {/* Genres Dropdown */}
-              <NavDropdown 
-                title={
-                  <>
-                    <i className="fas fa-tags me-1"></i>
-                    Genres
-                  </>
-                } 
+
+              {/* Genres Dropdown — mangafire-style 3-column mega-menu, no icons */}
+              <NavDropdown
+                title="Genres"
                 id="genres-dropdown"
+                className="mf-mega-dropdown"
               >
-                <NavDropdown.Item as={Link} to="/search?genre=action">
-                  <i className="fas fa-fist-raised me-2 text-danger"></i>
-                  Action
-                </NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/search?genre=romance">
-                  <i className="fas fa-heart me-2 text-pink"></i>
-                  Romance
-                </NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/search?genre=comedy">
-                  <i className="fas fa-laugh me-2 text-warning"></i>
-                  Comédie
-                </NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/search?genre=drama">
-                  <i className="fas fa-theater-masks me-2 text-info"></i>
-                  Drame
-                </NavDropdown.Item>
-                <NavDropdown.Item as={Link} to="/search?genre=adventure">
-                  <i className="fas fa-map me-2 text-success"></i>
-                  Aventure
-                </NavDropdown.Item>
-                <NavDropdown.Divider />
-                <NavDropdown.Item as={Link} to="/genres" className="fw-bold">
-                  <i className="fas fa-th-large me-2"></i>
-                  Tous les Genres
-                </NavDropdown.Item>
+                {[
+                  'Action', 'Adventure', 'Avant Garde',
+                  'Boys Love', 'Comedy', 'Demons',
+                  'Drama', 'Ecchi', 'Fantasy',
+                  'Girls Love', 'Gourmet', 'Harem',
+                  'Horror', 'Isekai', 'Iyashikei',
+                  'Josei', 'Kids', 'Magic',
+                  'Mahou Shoujo', 'Martial Arts', 'Mecha',
+                  'Military', 'Music', 'Mystery',
+                  'Parody', 'Psychological', 'Reverse Harem',
+                  'Romance', 'School', 'Sci-Fi',
+                  'Seinen', 'Shoujo', 'Shounen',
+                  'Slice of Life', 'Space', 'Sports',
+                  'Super Power', 'Supernatural', 'Suspense',
+                  'Thriller', 'Vampire'
+                ].map((g) => (
+                  <NavDropdown.Item
+                    key={g}
+                    as={Link}
+                    to={`/search?genre=${encodeURIComponent(g.toLowerCase())}`}
+                  >
+                    {g}
+                  </NavDropdown.Item>
+                ))}
               </NavDropdown>
             </Nav>
 
@@ -496,9 +470,9 @@ const NavigationBar = () => {
 
             {/* Desktop Right Controls */}
             <Nav className="align-items-center">
-              {/* Desktop Notifications */}
+              {/* Desktop Notifications — mangafire-style */}
               {isAuthenticated && (
-                <Dropdown className="me-2">
+                <Dropdown className="me-2 mf-notif-dropdown">
                   <Dropdown.Toggle
                     variant="link"
                     className={`text-decoration-none ${darkMode ? 'text-light' : 'text-dark'} position-relative`}
@@ -515,19 +489,45 @@ const NavigationBar = () => {
                       </Badge>
                     )}
                   </Dropdown.Toggle>
-                  <Dropdown.Menu align="end" style={{ minWidth: '300px' }}>
-                    <Dropdown.Header>Notifications</Dropdown.Header>
-                    {notifications.map((notification) => (
-                      <Dropdown.Item key={notification.id} className={notification.read ? 'text-muted' : ''}>
-                        <div className="d-flex">
-                          <i className={`fas ${notification.type === 'chapter' ? 'fa-book' : 'fa-heart'} me-2 mt-1`}></i>
-                          <div>
-                            <div className="fw-bold">{notification.title}</div>
-                            <small>{notification.message}</small>
+                  <Dropdown.Menu align="end" style={{ minWidth: '320px' }}>
+                    <div className="d-flex justify-content-between align-items-center px-3 py-2 mf-notif-head">
+                      <span className="fw-semibold">Notification</span>
+                      <button
+                        type="button"
+                        className="btn btn-link btn-sm p-0 text-decoration-none"
+                        onClick={async () => {
+                          try {
+                            await apiService.markAllNotificationsRead();
+                            setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+                            setNotificationCount(0);
+                          } catch (err) {
+                            console.error('Mark all as read failed:', err);
+                          }
+                        }}
+                        disabled={notificationCount === 0}
+                      >
+                        <i className="fas fa-check me-1"></i>
+                        Mark all as read
+                      </button>
+                    </div>
+                    <Dropdown.Divider className="my-0" />
+                    {notifications.length === 0 ? (
+                      <div className="text-center text-muted py-4 px-3">
+                        There is no notification.
+                      </div>
+                    ) : (
+                      notifications.map((notification) => (
+                        <Dropdown.Item key={notification.id} className={notification.read ? 'text-muted' : ''}>
+                          <div className="d-flex">
+                            <i className={`fas ${notification.type === 'chapter' ? 'fa-book' : 'fa-heart'} me-2 mt-1`}></i>
+                            <div>
+                              <div className="fw-bold">{notification.title}</div>
+                              <small>{notification.message}</small>
+                            </div>
                           </div>
-                        </div>
-                      </Dropdown.Item>
-                    ))}
+                        </Dropdown.Item>
+                      ))
+                    )}
                   </Dropdown.Menu>
                 </Dropdown>
               )}
@@ -590,21 +590,24 @@ const NavigationBar = () => {
                   align="end"
                 >
                   <NavDropdown.Item as={Link} to="/profile">
-                    <i className="fas fa-user-circle me-2 text-primary"></i>
-                    Mon Profil
-                  </NavDropdown.Item>
-                  <NavDropdown.Item as={Link} to="/favorites">
-                    <i className="fas fa-heart me-2 text-danger"></i>
-                    Mes Favoris
+                    <i className="fas fa-user me-2"></i>
+                    Profile
                   </NavDropdown.Item>
                   <NavDropdown.Item as={Link} to="/history">
-                    <i className="fas fa-history me-2 text-info"></i>
-                    Historique
+                    <i className="fas fa-history me-2"></i>
+                    Continue Reading
                   </NavDropdown.Item>
-                  <NavDropdown.Divider />
+                  <NavDropdown.Item as={Link} to="/favorites">
+                    <i className="fas fa-bookmark me-2"></i>
+                    Bookmark
+                  </NavDropdown.Item>
+                  <NavDropdown.Item as={Link} to="/profile/notifications">
+                    <i className="fas fa-bell me-2"></i>
+                    Notification
+                  </NavDropdown.Item>
                   <NavDropdown.Item as={Link} to="/settings">
-                    <i className="fas fa-cog me-2 text-secondary"></i>
-                    Paramètres
+                    <i className="fas fa-cog me-2"></i>
+                    Settings
                   </NavDropdown.Item>
                   {(user?.is_staff || user?.is_superuser) && (
                     <>
@@ -618,7 +621,7 @@ const NavigationBar = () => {
                   <NavDropdown.Divider />
                   <NavDropdown.Item onClick={handleLogout} className="text-danger">
                     <i className="fas fa-sign-out-alt me-2"></i>
-                    Déconnexion
+                    Logout
                   </NavDropdown.Item>
                 </NavDropdown>
               ) : (
@@ -1158,7 +1161,6 @@ const NavigationBar = () => {
         .dropdown-item {
           transition: all 0.3s ease;
           border-radius: 8px;
-          margin: 2px 8px;
         }
         
         .dropdown-item:hover {

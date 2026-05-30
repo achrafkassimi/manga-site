@@ -2,13 +2,17 @@
 import React, { useState } from 'react';
 import { Container, Row, Col, Form, Button, Toast } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
 const Footer = () => {
   const [email, setEmail] = useState('');
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  
+
+  const { user } = useAuth();
+  const isAdmin = Boolean(user?.is_staff || user?.is_superuser);
+
   const currentYear = new Date().getFullYear();
   const siteName = import.meta.env.VITE_SITE_NAME || 'MangaSet';
 
@@ -103,52 +107,54 @@ const Footer = () => {
       </div>
 
       <footer className="bg-dark text-light mt-auto">
-        {/* Newsletter Section */}
-        <div className="bg-primary py-4">
-          <Container>
-            <Row className="align-items-center">
-              <Col lg={6} className="mb-3 mb-lg-0">
-                <h5 className="text-white mb-2">
-                  <i className="fas fa-envelope me-2"></i>
-                  Stay Updated!
-                </h5>
-                <p className="text-white-50 mb-0">
-                  Get notified about new manga releases and updates
-                </p>
-              </Col>
-              <Col lg={6}>
-                <Form onSubmit={handleNewsletterSignup} className="d-flex gap-2">
-                  <Form.Control
-                    type="email"
-                    placeholder="Enter your email address"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={isLoading}
-                    className="flex-grow-1"
-                  />
-                  <Button 
-                    type="submit" 
-                    variant="light" 
-                    disabled={isLoading}
-                    className="px-4"
-                  >
-                    {isLoading ? (
-                      <>
-                        <i className="fas fa-spinner fa-spin me-2"></i>
-                        Subscribing...
-                      </>
-                    ) : (
-                      <>
-                        <i className="fas fa-paper-plane me-2"></i>
-                        Subscribe
-                      </>
-                    )}
-                  </Button>
-                </Form>
-              </Col>
-            </Row>
-          </Container>
-        </div>
+        {/* Newsletter Section — hidden when user is authenticated */}
+        {!user && (
+          <div className="bg-primary py-4">
+            <Container>
+              <Row className="align-items-center">
+                <Col lg={6} className="mb-3 mb-lg-0">
+                  <h5 className="text-white mb-2">
+                    <i className="fas fa-envelope me-2"></i>
+                    Stay Updated!
+                  </h5>
+                  <p className="text-white-50 mb-0">
+                    Get notified about new manga releases and updates
+                  </p>
+                </Col>
+                <Col lg={6}>
+                  <Form onSubmit={handleNewsletterSignup} className="d-flex gap-2">
+                    <Form.Control
+                      type="email"
+                      placeholder="Enter your email address"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      disabled={isLoading}
+                      className="flex-grow-1"
+                    />
+                    <Button
+                      type="submit"
+                      variant="light"
+                      disabled={isLoading}
+                      className="px-4"
+                    >
+                      {isLoading ? (
+                        <>
+                          <i className="fas fa-spinner fa-spin me-2"></i>
+                          Subscribing...
+                        </>
+                      ) : (
+                        <>
+                          <i className="fas fa-paper-plane me-2"></i>
+                          Subscribe
+                        </>
+                      )}
+                    </Button>
+                  </Form>
+                </Col>
+              </Row>
+            </Container>
+          </div>
+        )}
 
         {/* Main Footer Content */}
         <div className="py-5">
@@ -288,42 +294,44 @@ const Footer = () => {
                 </ul>
               </Col>
               
-              {/* Development & Stats */}
-              <Col lg={2} md={6} sm={6} className="mb-4">
-                <h6 className="mb-3 text-primary">Resources</h6>
-                <ul className="list-unstyled">
-                  <li className="mb-2">
-                    <Link to="/test" className="text-light text-decoration-none footer-link">
-                      <i className="fas fa-flask me-2"></i>Test Components
-                    </Link>
-                  </li>
-                  <li className="mb-2">
-                    <a 
-                      href="#" 
-                      className="text-light text-decoration-none footer-link"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <i className="fas fa-code me-2"></i>API Documentation
-                    </a>
-                  </li>
-                  <li className="mb-2">
-                    <a 
-                      href="#" 
-                      className="text-light text-decoration-none footer-link"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <i className="fab fa-github me-2"></i>GitHub Repository
-                    </a>
-                  </li>
-                  <li className="mb-2">
-                    <Link to="/stats" className="text-light text-decoration-none footer-link">
-                      <i className="fas fa-chart-bar me-2"></i>Site Statistics
-                    </Link>
-                  </li>
-                </ul>
-              </Col>
+              {/* Development & Stats — admin only */}
+              {isAdmin && (
+                <Col lg={2} md={6} sm={6} className="mb-4">
+                  <h6 className="mb-3 text-primary">Resources</h6>
+                  <ul className="list-unstyled">
+                    <li className="mb-2">
+                      <Link to="/test" className="text-light text-decoration-none footer-link">
+                        <i className="fas fa-flask me-2"></i>Test Components
+                      </Link>
+                    </li>
+                    <li className="mb-2">
+                      <a
+                        href="#"
+                        className="text-light text-decoration-none footer-link"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <i className="fas fa-code me-2"></i>API Documentation
+                      </a>
+                    </li>
+                    <li className="mb-2">
+                      <a
+                        href="#"
+                        className="text-light text-decoration-none footer-link"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <i className="fab fa-github me-2"></i>GitHub Repository
+                      </a>
+                    </li>
+                    <li className="mb-2">
+                      <Link to="/stats" className="text-light text-decoration-none footer-link">
+                        <i className="fas fa-chart-bar me-2"></i>Site Statistics
+                      </Link>
+                    </li>
+                  </ul>
+                </Col>
+              )}
             </Row>
           </Container>
         </div>
