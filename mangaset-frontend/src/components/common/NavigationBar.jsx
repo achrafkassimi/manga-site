@@ -612,6 +612,10 @@ const NavigationBar = () => {
                   {(user?.is_staff || user?.is_superuser) && (
                     <>
                       <NavDropdown.Divider />
+                      <NavDropdown.Item as={Link} to="/admin/dashboard" className="text-warning">
+                        <i className="fas fa-tachometer-alt me-2"></i>
+                        Admin Dashboard
+                      </NavDropdown.Item>
                       <NavDropdown.Item as={Link} to="/monitoring" className="text-warning">
                         <i className="fas fa-chart-line me-2"></i>
                         Monitoring

@@ -1,7 +1,7 @@
 // src/components/common/Footer.jsx - Enhanced Version
 import React, { useState } from 'react';
 import { Container, Row, Col, Form, Button, Toast } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
 const Footer = () => {
@@ -12,6 +12,8 @@ const Footer = () => {
 
   const { user } = useAuth();
   const isAdmin = Boolean(user?.is_staff || user?.is_superuser);
+  const location = useLocation();
+  const isAdminPage = location.pathname.startsWith('/admin') || location.pathname === '/monitoring';
 
   const currentYear = new Date().getFullYear();
   const siteName = import.meta.env.VITE_SITE_NAME || 'MangaSet';
@@ -156,7 +158,8 @@ const Footer = () => {
           </div>
         )}
 
-        {/* Main Footer Content */}
+        {/* Main Footer Content — hidden on admin pages */}
+        {!isAdminPage && (
         <div className="py-5">
           <Container>
             <Row>
@@ -335,7 +338,8 @@ const Footer = () => {
             </Row>
           </Container>
         </div>
-        
+        )}
+
         {/* Bottom Bar */}
         <div className="border-top border-secondary py-3">
           <Container>

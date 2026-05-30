@@ -154,8 +154,10 @@ const Sidebar = ({ user }) => {
         width: 240,
         minWidth: 240,
         position: 'sticky',
-        top: 0,
-        height: '100vh',
+        top: 56,
+        height: 'calc(100vh - 56px)',
+        maxHeight: 'calc(100vh - 56px)',
+        overflowY: 'auto',
         backgroundColor: 'var(--app-surface, #1e1e1e)',
       }}
     >
@@ -230,9 +232,10 @@ const Topbar = ({ onRefresh, refreshing, notifCount = 3 }) => {
           variant="outline-primary"
           onClick={() => navigate('/admin/manga/create')}
         >
-          <i className="fas fa-plus me-1"></i> Nouveau manga
+          <i className="fas fa-plus me-1"></i>Nouveau manga
         </Button>
-        <Button
+
+        {/* <Button
           size="sm"
           variant="outline-secondary"
           className="position-relative"
@@ -245,7 +248,8 @@ const Topbar = ({ onRefresh, refreshing, notifCount = 3 }) => {
               style={{ width: 10, height: 10 }}
             />
           )}
-        </Button>
+        </Button> */}
+
         <Button
           size="sm"
           variant="outline-secondary"
@@ -655,10 +659,16 @@ const AdminDashboardPage = () => {
     : null;
 
   return (
-    <div className="d-flex" style={{ minHeight: '100vh' }}>
+    <div
+      className="d-flex"
+      style={{
+        minHeight: 'calc(100vh - 56px)',
+        width: '100%',
+      }}
+    >
       <Sidebar user={user} />
 
-      <main className="flex-grow-1 p-3 p-md-4" style={{ minWidth: 0 }}>
+      <main className="flex-grow-1 p-3 p-md-4" style={{ minWidth: 0, width: 1548}}>
         <Container fluid className="px-0">
           <Topbar
             onRefresh={() => fetchAll(true)}
